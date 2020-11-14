@@ -6,6 +6,7 @@ mutation Login($credentials: CredentialsInput!) {
     }
     user {
       id
+      username
     }
   }
 }
