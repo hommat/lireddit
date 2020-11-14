@@ -6,5 +6,6 @@ mutation Register($credentials: CredentialsInput!) {
     }
     user {
       ...CurrentUser
+    }
   }
 }

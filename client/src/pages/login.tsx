@@ -8,6 +8,7 @@ import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
 import { useLoginMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
+import { withUrqlClient } from '../utils/withUrqlClient';
 
 const Login = ({}) => {
   const [credentialsError, setCredentialsError] = useState('');
@@ -63,4 +64,4 @@ const Login = ({}) => {
   );
 };
 
-export default Login;
+export default withUrqlClient()(Login);

@@ -8,6 +8,7 @@ import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
 import { useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
+import { withUrqlClient } from '../utils/withUrqlClient';
 
 const Register = ({}) => {
   const router = useRouter();
@@ -58,4 +59,4 @@ const Register = ({}) => {
   );
 };
 
-export default Register;
+export default withUrqlClient()(Register);

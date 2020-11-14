@@ -106,6 +106,25 @@ export type LogoutMutation = (
   & Pick<Mutation, 'logout'>
 );
 
+export type RegisterMutationVariables = Exact<{
+  credentials: CredentialsInput;
+}>;
+
+
+export type RegisterMutation = (
+  { __typename?: 'Mutation' }
+  & { register: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & CurrentUserFragment
+    )> }
+  ) }
+);
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -148,6 +167,23 @@ export const LogoutDocument = gql`
 
 export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
+};
+export const RegisterDocument = gql`
+    mutation Register($credentials: CredentialsInput!) {
+  register(credentials: $credentials) {
+    errors {
+      field
+      message
+    }
+    user {
+      ...CurrentUser
+    }
+  }
+}
+    ${CurrentUserFragmentDoc}`;
+
+export function useRegisterMutation() {
+  return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
 export const CurrentUserDocument = gql`
     query CurrentUser {
