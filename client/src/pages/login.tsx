@@ -1,31 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Formik, Form } from 'formik';
-import { Button } from '@chakra-ui/core';
+import { Button, FormErrorMessage, FormControl } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
 import Layout from '../components/Layout';
 import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
-import { useRegisterMutation } from '../generated/graphql';
+import { useLoginMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
 
-const Register = ({}) => {
+const Login = ({}) => {
+  const [credentialsError, setCredentialsError] = useState('');
   const router = useRouter();
-  const [, register] = useRegisterMutation();
+  const [, login] = useLoginMutation();
 
   return (
     <Layout>
       <Wrapper variant="small">
         <Formik
           initialValues={{ username: '', password: '' }}
-          onSubmit={async (values, { setErrors }) => {
-            const { data } = await register({ credentials: values });
+          onSubmit={async (values) => {
+            const { data } = await login({ credentials: values });
             if (!data) return;
 
-            const { errors, user } = data.register;
+            const { errors, user } = data.login;
 
             if (errors) {
-              return setErrors(toErrorMap(errors));
+              const errorsMap = toErrorMap(errors);
+              return setCredentialsError(errorsMap.credentials || '');
             }
 
             if (user) {
@@ -33,7 +35,7 @@ const Register = ({}) => {
             }
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, touched }) => (
             <Form>
               <InputField
                 name="username"
@@ -46,9 +48,12 @@ const Register = ({}) => {
                 placeholder="Enter password..."
                 type="password"
               />
+              <FormControl isInvalid={!!credentialsError}>
+                <FormErrorMessage>{credentialsError}</FormErrorMessage>
+              </FormControl>
 
               <Button type="submit" mt={4} isLoading={isSubmitting}>
-                Register
+                Login
               </Button>
             </Form>
           )}
@@ -58,4 +63,4 @@ const Register = ({}) => {
   );
 };
 
-export default Register;
+export default Login;

@@ -22,10 +22,10 @@ const InputField: FC<InputFieldProps> = ({
   const [field, { touched, error }] = useField(rest);
 
   return (
-    <FormControl isInvalid={error && touched} mt={mt}>
+    <FormControl isInvalid={!!error && touched} mt={mt}>
       <FormLabel htmlFor={field.name}>{label}</FormLabel>
       <Input {...rest} {...field} id={field.name} />
-      {error && <FormErrorMessage>{error}</FormErrorMessage>}
+      <FormErrorMessage>{error}</FormErrorMessage>
     </FormControl>
   );
 };

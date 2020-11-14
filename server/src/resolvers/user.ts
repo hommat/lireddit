@@ -13,7 +13,7 @@ import { User } from '../entities/User';
 import argon2 from 'argon2';
 
 @InputType()
-class UsernameAndPasswordInput {
+class CredentialsInput {
   @Field()
   username: string;
 
@@ -55,7 +55,7 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async register(
-    @Arg('credentials') { username, password }: UsernameAndPasswordInput,
+    @Arg('credentials') { username, password }: CredentialsInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const hashedPassword = await argon2.hash(password);
@@ -76,7 +76,7 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg('credentials') { username, password }: UsernameAndPasswordInput,
+    @Arg('credentials') { username, password }: CredentialsInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const user = await em.findOne(User, { username });
