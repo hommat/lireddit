@@ -9,12 +9,18 @@ import {
   ChangePasswordMutation,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
+import { cursorPagination } from './pagination';
 
 export const createUrlClient = (ssrExchange: any): ClientOptions => ({
   url: 'http://localhost:4000/graphql',
   exchanges: [
     dedupExchange,
     cacheExchange({
+      resolvers: {
+        Query: {
+          posts: cursorPagination(),
+        },
+      },
       updates: {
         Mutation: {
           logout: (results, args, cache, info) => {
