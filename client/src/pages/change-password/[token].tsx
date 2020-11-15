@@ -23,60 +23,57 @@ const ChangePassword = () => {
   const token = router.query.token as string;
 
   return (
-    <Layout>
-      <Wrapper variant="small">
-        <Formik
-          initialValues={{ password: '' }}
-          onSubmit={async (values, { setErrors }) => {
-            console.log(values);
-            console.log(token);
-            const { data } = await changePassword({
-              changePasswordInput: { ...values, token },
-            });
-            if (!data) return;
+    <Layout variant="small">
+      <Formik
+        initialValues={{ password: '' }}
+        onSubmit={async (values, { setErrors }) => {
+          console.log(values);
+          console.log(token);
+          const { data } = await changePassword({
+            changePasswordInput: { ...values, token },
+          });
+          if (!data) return;
 
-            const { errors, user } = data.changePassword;
+          const { errors, user } = data.changePassword;
 
-            if (errors) {
-              const { token: tokenError, ...rest } = toErrorMap(errors);
-              console.log(tokenError || '');
-              setTokenError(tokenError || '');
-              return setErrors(rest);
-            }
+          if (errors) {
+            const { token: tokenError, ...rest } = toErrorMap(errors);
+            console.log(tokenError || '');
+            setTokenError(tokenError || '');
+            return setErrors(rest);
+          }
 
-            if (user) {
-              router.push('/');
-            }
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <InputField
-                name="password"
-                type="password"
-                label="New password"
-                placeholder="Enter New password..."
-              />
+          if (user) {
+            router.push('/');
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <InputField
+              name="password"
+              type="password"
+              label="New password"
+              placeholder="Enter New password..."
+            />
 
-              {tokenError && (
-                <Box>
-                  <FormControl isInvalid>
-                    <FormErrorMessage>{tokenError}</FormErrorMessage>
-                  </FormControl>
-                  <Link>
-                    Get new link{' '}
-                    <NextLink href="/forgot-password">here</NextLink>
-                  </Link>
-                </Box>
-              )}
+            {tokenError && (
+              <Box>
+                <FormControl isInvalid>
+                  <FormErrorMessage>{tokenError}</FormErrorMessage>
+                </FormControl>
+                <Link>
+                  Get new link <NextLink href="/forgot-password">here</NextLink>
+                </Link>
+              </Box>
+            )}
 
-              <Button type="submit" mt={4} isLoading={isSubmitting}>
-                Change password
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </Wrapper>
+            <Button type="submit" mt={4} isLoading={isSubmitting}>
+              Change password
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Layout>
   );
 };

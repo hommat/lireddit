@@ -1,14 +1,15 @@
 import React, { FC } from 'react';
 
 import NavBar from './NavBar';
+import Wrapper, { WrapperProps } from './Wrapper';
 
-interface LayoutProps {}
+interface LayoutProps extends WrapperProps {}
 
-const Layout: FC<LayoutProps> = ({ children }) => {
+const Layout: FC<LayoutProps> = ({ children, ...wrapperProps }) => {
   return (
     <div>
       <NavBar />
-      <div>{children}</div>
+      <Wrapper {...wrapperProps}>{children}</Wrapper>
     </div>
   );
 };

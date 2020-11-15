@@ -18,36 +18,34 @@ const ForgotPassword = ({}) => {
   const [_, forgotPassword] = useForgotPasswordMutation();
 
   return (
-    <Layout>
-      <Wrapper variant="small">
-        {message ? (
-          <Box>{message}</Box>
-        ) : (
-          <Formik
-            initialValues={{ email: '' }}
-            onSubmit={async (values) => {
-              const { data } = await forgotPassword(values);
-              if (!data) return;
+    <Layout variant="small">
+      {message ? (
+        <Box>{message}</Box>
+      ) : (
+        <Formik
+          initialValues={{ email: '' }}
+          onSubmit={async (values) => {
+            const { data } = await forgotPassword(values);
+            if (!data) return;
 
-              return setMessage(data.forgotPassword);
-            }}
-          >
-            {({ isSubmitting }) => (
-              <Form>
-                <InputField
-                  name="email"
-                  label="Enter email"
-                  placeholder="Enter email..."
-                />
+            return setMessage(data.forgotPassword);
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <InputField
+                name="email"
+                label="Enter email"
+                placeholder="Enter email..."
+              />
 
-                <Button type="submit" mt={4} isLoading={isSubmitting}>
-                  Reset password
-                </Button>
-              </Form>
-            )}
-          </Formik>
-        )}
-      </Wrapper>
+              <Button type="submit" mt={4} isLoading={isSubmitting}>
+                Reset password
+              </Button>
+            </Form>
+          )}
+        </Formik>
+      )}
     </Layout>
   );
 };

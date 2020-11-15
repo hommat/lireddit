@@ -20,52 +20,50 @@ const Register = ({}) => {
   };
 
   return (
-    <Layout>
-      <Wrapper variant="small">
-        <Formik
-          initialValues={initialValues}
-          onSubmit={async (values, { setErrors }) => {
-            const { data } = await register({ registerInput: values });
-            if (!data) return;
+    <Layout variant="small">
+      <Formik
+        initialValues={initialValues}
+        onSubmit={async (values, { setErrors }) => {
+          const { data } = await register({ registerInput: values });
+          if (!data) return;
 
-            const { errors, user } = data.register;
+          const { errors, user } = data.register;
 
-            if (errors) {
-              return setErrors(toErrorMap(errors));
-            }
+          if (errors) {
+            return setErrors(toErrorMap(errors));
+          }
 
-            if (user) {
-              router.push('/');
-            }
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <InputField
-                name="username"
-                label="Enter username"
-                placeholder="Enter username..."
-              />
-              <InputField
-                name="email"
-                label="Enter email"
-                placeholder="Enter email..."
-                type="email"
-              />
-              <InputField
-                name="password"
-                label="Enter password"
-                placeholder="Enter password..."
-                type="password"
-              />
+          if (user) {
+            router.push('/');
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <InputField
+              name="username"
+              label="Enter username"
+              placeholder="Enter username..."
+            />
+            <InputField
+              name="email"
+              label="Enter email"
+              placeholder="Enter email..."
+              type="email"
+            />
+            <InputField
+              name="password"
+              label="Enter password"
+              placeholder="Enter password..."
+              type="password"
+            />
 
-              <Button type="submit" mt={4} isLoading={isSubmitting}>
-                Register
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </Wrapper>
+            <Button type="submit" mt={4} isLoading={isSubmitting}>
+              Register
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Layout>
   );
 };

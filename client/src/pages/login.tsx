@@ -17,53 +17,54 @@ const Login = ({}) => {
   const [, login] = useLoginMutation();
 
   return (
-    <Layout>
-      <Wrapper variant="small">
-        <Formik
-          initialValues={{ username: '', password: '' }}
-          onSubmit={async (values) => {
-            const { data } = await login({ loginInput: values });
-            if (!data) return;
+    <Layout variant="small">
+      <Formik
+        initialValues={{ username: '', password: '' }}
+        onSubmit={async (values) => {
+          const { data } = await login({ loginInput: values });
+          if (!data) return;
 
-            const { errors, user } = data.login;
+          const { errors, user } = data.login;
 
-            if (errors) {
-              const errorsMap = toErrorMap(errors);
-              return setCredentialsError(errorsMap.credentials || '');
-            }
+          if (errors) {
+            const errorsMap = toErrorMap(errors);
+            return setCredentialsError(errorsMap.credentials || '');
+          }
 
-            if (user) {
-              router.push('/');
-            }
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <InputField
-                name="username"
-                label="Enter username"
-                placeholder="Enter username..."
-              />
-              <InputField
-                name="password"
-                label="Enter password"
-                placeholder="Enter password..."
-                type="password"
-              />
-              <FormControl isInvalid={!!credentialsError}>
-                <FormErrorMessage>{credentialsError}</FormErrorMessage>
-              </FormControl>
+          if (user) {
+            const { next } = router.query;
+            const nextRoute = typeof next === 'string' ? next : '/';
 
-              <Button type="submit" mt={4} isLoading={isSubmitting}>
-                Login
-              </Button>
-            </Form>
-          )}
-        </Formik>
-        <Link>
-          <NextLink href="/forgot-password">Forgot password?</NextLink>
-        </Link>
-      </Wrapper>
+            router.push(nextRoute);
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <InputField
+              name="username"
+              label="Enter username"
+              placeholder="Enter username..."
+            />
+            <InputField
+              name="password"
+              label="Enter password"
+              placeholder="Enter password..."
+              type="password"
+            />
+            <FormControl isInvalid={!!credentialsError}>
+              <FormErrorMessage>{credentialsError}</FormErrorMessage>
+            </FormControl>
+
+            <Button type="submit" mt={4} isLoading={isSubmitting}>
+              Login
+            </Button>
+          </Form>
+        )}
+      </Formik>
+      <Link>
+        <NextLink href="/forgot-password">Forgot password?</NextLink>
+      </Link>
     </Layout>
   );
 };
