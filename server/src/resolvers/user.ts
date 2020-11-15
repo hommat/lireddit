@@ -11,15 +11,32 @@ import {
 import { MyContext } from 'src/types';
 import { User } from '../entities/User';
 import argon2 from 'argon2';
-import { COOKIE_NAME } from '../constants';
+import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants';
+import { sendEmail } from '../utils/sendEmail';
+import { v4 } from 'uuid';
 
 @InputType()
-class CredentialsInput {
+class LoginInput {
   @Field()
   username: string;
 
   @Field()
   password: string;
+}
+
+@InputType()
+class RegisterInput extends LoginInput {
+  @Field()
+  email: string;
+}
+
+@InputType()
+class ChangePasswordInput {
+  @Field()
+  password: string;
+
+  @Field()
+  token: string;
 }
 
 @ObjectType()
@@ -55,18 +72,80 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg('changePasswordInput') { token, password }: ChangePasswordInput,
+    @Ctx() { redis, em, req }: MyContext
+  ): Promise<UserResponse> {
+    const tokenKey = FORGOT_PASSWORD_PREFIX + token;
+
+    const userId = await redis.get(tokenKey);
+    if (!userId) {
+      return {
+        errors: [{ field: 'token', message: 'Token is not valid' }],
+      };
+    }
+
+    const user = await em.findOne(User, { id: +userId });
+    if (!user) {
+      return {
+        errors: [{ field: 'token', message: 'User not longer exists' }],
+      };
+    }
+
+    const hashPasswordPromise = argon2.hash(password);
+    const deleteTokenPromise = redis.del(tokenKey);
+
+    const [hashedPassword] = await Promise.all([
+      hashPasswordPromise,
+      deleteTokenPromise,
+    ]);
+    user.password = hashedPassword;
+
+    (req.session as any).userId = user.id;
+
+    return { user };
+  }
+
+  @Mutation(() => String)
+  async forgotPassword(
+    @Arg('email') email: string,
+    @Ctx() { em, redis }: MyContext
+  ): Promise<string> {
+    const user = await em.findOne(User, { email });
+
+    if (user) {
+      const token = v4();
+      await redis.set(
+        FORGOT_PASSWORD_PREFIX + token,
+        user.id,
+        'ex',
+        1000 * 60 * 60 * 24 * 3
+      );
+
+      sendEmail(
+        email,
+        `<a href="http://localhost:3000/change-password/${token}">reset password</a>`
+      );
+    }
+
+    return 'Confirmation email was sent, you should receive it soon if email exists';
+  }
+
+  @Mutation(() => UserResponse)
   async register(
-    @Arg('credentials') { username, password }: CredentialsInput,
+    @Arg('registerInput') { username, password, email }: RegisterInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const hashedPassword = await argon2.hash(password);
-    const user = em.create(User, { username, password: hashedPassword });
+    const user = em.create(User, { username, email, password: hashedPassword });
 
     try {
       await em.persistAndFlush(user);
     } catch (e) {
       return {
-        errors: [{ field: 'username', message: 'Username already exists' }],
+        errors: [
+          { field: 'username', message: 'Username or email already exists' },
+        ],
       };
     }
 
@@ -77,7 +156,7 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg('credentials') { username, password }: CredentialsInput,
+    @Arg('loginInput') { username, password }: LoginInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const user = await em.findOne(User, { username });

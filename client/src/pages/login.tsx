@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import NextLink from 'next/link';
 import { Formik, Form } from 'formik';
-import { Button, FormErrorMessage, FormControl } from '@chakra-ui/core';
+import { Button, FormErrorMessage, FormControl, Link } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
 import Layout from '../components/Layout';
@@ -21,7 +22,7 @@ const Login = ({}) => {
         <Formik
           initialValues={{ username: '', password: '' }}
           onSubmit={async (values) => {
-            const { data } = await login({ credentials: values });
+            const { data } = await login({ loginInput: values });
             if (!data) return;
 
             const { errors, user } = data.login;
@@ -36,7 +37,7 @@ const Login = ({}) => {
             }
           }}
         >
-          {({ isSubmitting, touched }) => (
+          {({ isSubmitting }) => (
             <Form>
               <InputField
                 name="username"
@@ -59,6 +60,9 @@ const Login = ({}) => {
             </Form>
           )}
         </Formik>
+        <Link>
+          <NextLink href="/forgot-password">Forgot password?</NextLink>
+        </Link>
       </Wrapper>
     </Layout>
   );

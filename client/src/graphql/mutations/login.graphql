@@ -1,11 +1,5 @@
-mutation Login($credentials: CredentialsInput!) {
-  login(credentials: $credentials) {
-    errors {
-      field
-      message
-    }
-    user {
-      ...CurrentUser
-    }
+mutation Login($loginInput: LoginInput!) {
+  login(loginInput: $loginInput) {
+    ...RegularUserResponse
   }
 }

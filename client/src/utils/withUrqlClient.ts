@@ -5,6 +5,5 @@ import {
 
 import { createUrlClient } from './createUrqlClient';
 
-export const withUrqlClient = (options?: WithUrqlClientOptions) => {
-  return defaultWithUrqlClient(createUrlClient, options);
-};
+export const withUrqlClient = (options?: WithUrqlClientOptions) =>
+  defaultWithUrqlClient(createUrlClient, options);

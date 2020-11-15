@@ -1,11 +1,5 @@
-mutation Register($credentials: CredentialsInput!) {
-  register(credentials: $credentials) {
-    errors {
-      field
-      message
-    }
-    user {
-      ...CurrentUser
-    }
+mutation Register($registerInput: RegisterInput!) {
+  register(registerInput: $registerInput) {
+    ...RegularUserResponse
   }
 }

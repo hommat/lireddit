@@ -6,6 +6,7 @@ import {
   CurrentUserQuery,
   LoginMutation,
   RegisterMutation,
+  ChangePasswordMutation,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
 
@@ -22,6 +23,21 @@ export const createUrlClient = (ssrExchange: any): ClientOptions => ({
               { query: CurrentUserDocument },
               results,
               () => ({ currentUser: null })
+            );
+          },
+
+          changePassword: (results, args, cache, info) => {
+            betterUpdateQuery<ChangePasswordMutation, CurrentUserQuery>(
+              cache,
+              { query: CurrentUserDocument },
+              results,
+              (result, query) => {
+                if (result.changePassword.errors) {
+                  return query;
+                }
+
+                return { currentUser: result.changePassword.user };
+              }
             );
           },
 

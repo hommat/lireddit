@@ -6,21 +6,26 @@ import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
-import { useRegisterMutation } from '../generated/graphql';
+import { useRegisterMutation, RegisterInput } from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
 import { withUrqlClient } from '../utils/withUrqlClient';
 
 const Register = ({}) => {
   const router = useRouter();
   const [, register] = useRegisterMutation();
+  const initialValues: RegisterInput = {
+    username: '',
+    password: '',
+    email: '',
+  };
 
   return (
     <Layout>
       <Wrapper variant="small">
         <Formik
-          initialValues={{ username: '', password: '' }}
+          initialValues={initialValues}
           onSubmit={async (values, { setErrors }) => {
-            const { data } = await register({ credentials: values });
+            const { data } = await register({ registerInput: values });
             if (!data) return;
 
             const { errors, user } = data.register;
@@ -40,6 +45,12 @@ const Register = ({}) => {
                 name="username"
                 label="Enter username"
                 placeholder="Enter username..."
+              />
+              <InputField
+                name="email"
+                label="Enter email"
+                placeholder="Enter email..."
+                type="email"
               />
               <InputField
                 name="password"
