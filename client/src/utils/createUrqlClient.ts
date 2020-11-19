@@ -10,79 +10,88 @@ import {
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { cursorPagination } from './pagination';
+import { isServer } from './isServer';
 
-export const createUrlClient = (ssrExchange: any): ClientOptions => ({
-  url: 'http://localhost:4000/graphql',
-  exchanges: [
-    dedupExchange,
-    cacheExchange({
-      resolvers: {
-        Query: {
-          posts: cursorPagination(),
-        },
-      },
-      updates: {
-        Mutation: {
-          logout: (results, args, cache, info) => {
-            betterUpdateQuery<LoginMutation, CurrentUserQuery>(
-              cache,
-              { query: CurrentUserDocument },
-              results,
-              () => ({ currentUser: null })
-            );
-          },
+export const createUrlClient = (ssrExchange: any, ctx: any): ClientOptions => {
+  let cookie = '';
+  if (isServer() && ctx && ctx.req) {
+    cookie = ctx.req.headers.cookie;
+  }
 
-          changePassword: (results, args, cache, info) => {
-            betterUpdateQuery<ChangePasswordMutation, CurrentUserQuery>(
-              cache,
-              { query: CurrentUserDocument },
-              results,
-              (result, query) => {
-                if (result.changePassword.errors) {
-                  return query;
-                }
-
-                return { currentUser: result.changePassword.user };
-              }
-            );
-          },
-
-          login: (results, args, cache, info) => {
-            betterUpdateQuery<LoginMutation, CurrentUserQuery>(
-              cache,
-              { query: CurrentUserDocument },
-              results,
-              (result, query) => {
-                if (result.login.errors) {
-                  return query;
-                }
-
-                return { currentUser: result.login.user };
-              }
-            );
-          },
-
-          register: (results, args, cache, info) => {
-            betterUpdateQuery<RegisterMutation, CurrentUserQuery>(
-              cache,
-              { query: CurrentUserDocument },
-              results,
-              (result, query) => {
-                if (result.register.errors) {
-                  return query;
-                }
-
-                return { currentUser: result.register.user };
-              }
-            );
+  return {
+    url: 'http://localhost:4000/graphql',
+    exchanges: [
+      dedupExchange,
+      cacheExchange({
+        resolvers: {
+          Query: {
+            posts: cursorPagination(),
           },
         },
-      },
-    }),
-    ssrExchange,
-    fetchExchange,
-  ],
-  fetchOptions: {
-    credentials: 'include',
-  },
-});
+        updates: {
+          Mutation: {
+            logout: (results, args, cache, info) => {
+              betterUpdateQuery<LoginMutation, CurrentUserQuery>(
+                cache,
+                { query: CurrentUserDocument },
+                results,
+                () => ({ currentUser: null })
+              );
+            },
+
+            changePassword: (results, args, cache, info) => {
+              betterUpdateQuery<ChangePasswordMutation, CurrentUserQuery>(
+                cache,
+                { query: CurrentUserDocument },
+                results,
+                (result, query) => {
+                  if (result.changePassword.errors) {
+                    return query;
+                  }
+
+                  return { currentUser: result.changePassword.user };
+                }
+              );
+            },
+
+            login: (results, args, cache, info) => {
+              betterUpdateQuery<LoginMutation, CurrentUserQuery>(
+                cache,
+                { query: CurrentUserDocument },
+                results,
+                (result, query) => {
+                  if (result.login.errors) {
+                    return query;
+                  }
+
+                  return { currentUser: result.login.user };
+                }
+              );
+            },
+
+            register: (results, args, cache, info) => {
+              betterUpdateQuery<RegisterMutation, CurrentUserQuery>(
+                cache,
+                { query: CurrentUserDocument },
+                results,
+                (result, query) => {
+                  if (result.register.errors) {
+                    return query;
+                  }
+
+                  return { currentUser: result.register.user };
+                }
+              );
+            },
+          },
+        },
+      }),
+      ssrExchange,
+      fetchExchange,
+    ],
+    fetchOptions: {
+      credentials: 'include',
+      headers: cookie ? { cookie } : undefined,
+    },
+  };
+};

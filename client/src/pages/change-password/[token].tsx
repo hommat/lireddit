@@ -27,8 +27,6 @@ const ChangePassword = () => {
       <Formik
         initialValues={{ password: '' }}
         onSubmit={async (values, { setErrors }) => {
-          console.log(values);
-          console.log(token);
           const { data } = await changePassword({
             changePasswordInput: { ...values, token },
           });
@@ -38,7 +36,7 @@ const ChangePassword = () => {
 
           if (errors) {
             const { token: tokenError, ...rest } = toErrorMap(errors);
-            console.log(tokenError || '');
+
             setTokenError(tokenError || '');
             return setErrors(rest);
           }

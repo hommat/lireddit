@@ -5,6 +5,10 @@ query Posts($limit: Int!, $cursor: String) {
       textSnippet
       title
       createdAt
+      points
+      creator {
+        username
+      }
     }
     hasMore
   }

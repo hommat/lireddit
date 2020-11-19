@@ -11,8 +11,11 @@ import connectRedis from 'connect-redis';
 import { MyContext } from './types';
 import cors from 'cors';
 import { createConnection } from 'typeorm';
+import { VoteResolver } from './resolvers/vote';
 import { Post } from './entities/Post';
+import { Vote } from './entities/Vote';
 import { User } from './entities/User';
+import { createUserLoader } from './utils/createUserLoader';
 
 let RedisStore = connectRedis(session);
 let redis = new Redis();
@@ -25,7 +28,7 @@ const main = async () => {
     password: 'password',
     logging: true,
     synchronize: !__prod__,
-    entities: [Post, User],
+    entities: [Post, Vote, User],
   });
 
   const app = express();
@@ -55,10 +58,15 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, PostResolver],
+      resolvers: [UserResolver, PostResolver, VoteResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ req, res, redis }),
+    context: ({ req, res }): MyContext => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(),
+    }),
   });
 
   apolloServer.applyMiddleware({

@@ -7,6 +7,8 @@ import {
   Field,
   ObjectType,
   Query,
+  FieldResolver,
+  Root,
 } from 'type-graphql';
 import { MyContext } from 'src/types';
 import { User } from '../entities/User';
@@ -58,8 +60,17 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() { email, id }: User, @Ctx() { req }: MyContext): string {
+    if ((req.session as any).userId === id) {
+      return email;
+    }
+
+    return '';
+  }
+
   @Query(() => User, { nullable: true })
   currentUser(@Ctx() { req }: MyContext) {
     const { userId } = req.session as any;

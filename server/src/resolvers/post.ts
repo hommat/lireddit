@@ -16,6 +16,7 @@ import { Post } from '../entities/Post';
 import { MyContext } from 'src/types';
 import { isAuth } from '../middleware/isAuth';
 import { getConnection } from 'typeorm';
+import { User } from '../entities/User';
 
 @InputType()
 class CreatePostInput {
@@ -38,8 +39,16 @@ class PaginatedPosts {
 @Resolver(Post)
 export class PostResolver {
   @FieldResolver(() => String)
-  textSnippet(@Root() post: Post) {
+  textSnippet(@Root() post: Post): string {
     return post.text.slice(0, 50) + '...';
+  }
+
+  @FieldResolver(() => User)
+  async creator(
+    @Root() { creatorId }: Post,
+    @Ctx() { userLoader }: MyContext
+  ): Promise<User> {
+    return userLoader.load(creatorId);
   }
 
   @Query(() => PaginatedPosts)
@@ -53,11 +62,11 @@ export class PostResolver {
     const qb = getConnection()
       .getRepository(Post)
       .createQueryBuilder('p')
-      .orderBy('"createdAt"', 'DESC')
+      .orderBy('p.createdAt', 'DESC')
       .take(realLimitPlusOne);
 
     if (cursor) {
-      qb.where('"createdAt" < :c', { c: new Date(+cursor) });
+      qb.where('p.createdAt < :c', { c: new Date(+cursor) });
     }
 
     const posts = await qb.getMany();
