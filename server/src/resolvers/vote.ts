@@ -1,6 +1,5 @@
 import {
   Resolver,
-  Query,
   Arg,
   Mutation,
   InputType,
@@ -8,9 +7,6 @@ import {
   Ctx,
   UseMiddleware,
   Int,
-  FieldResolver,
-  Root,
-  ObjectType,
 } from 'type-graphql';
 import { Post } from '../entities/Post';
 import { MyContext } from 'src/types';

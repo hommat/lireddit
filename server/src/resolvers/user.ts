@@ -16,7 +16,6 @@ import argon2 from 'argon2';
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants';
 import { sendEmail } from '../utils/sendEmail';
 import { v4 } from 'uuid';
-import { getConnection } from 'typeorm';
 
 @InputType()
 class LoginInput {

@@ -19,15 +19,18 @@ import { createUserLoader } from './utils/createUserLoader';
 import { createVoteLoader } from './utils/createVoteLoader';
 
 let RedisStore = connectRedis(session);
-let redis = new Redis();
+let redis = new Redis({
+  host: process.env.REDIS_HOST,
+});
 
 const main = async () => {
   await createConnection({
     type: 'postgres',
-    database: 'lireddit',
-    username: 'user',
-    password: 'password',
-    logging: true,
+    host: process.env.POSTGRES_HOST,
+    database: process.env.POSTGRES_DB,
+    username: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
+    logging: !__prod__,
     synchronize: !__prod__,
     entities: [Post, Vote, User],
   });
@@ -36,7 +39,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: [process.env.WEB_HOST_CLIENT!, process.env.WEB_HOST_SERVER!],
       credentials: true,
     })
   );
@@ -52,7 +55,7 @@ const main = async () => {
         secure: __prod__,
       },
       saveUninitialized: false,
-      secret: 'keyboard cat',
+      secret: process.env.COOKIE_SECRET!,
       resave: false,
     })
   );
@@ -77,7 +80,9 @@ const main = async () => {
   });
 
   app.listen(4000, () => {
-    console.log('server started on localhost:4000');
+    if (!__prod__) {
+      console.log('server started on localhost:4000');
+    }
   });
 };
 

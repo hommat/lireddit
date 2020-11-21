@@ -1,0 +1,50 @@
+version: '3.7'
+services:
+  web:
+    build:
+      context: client
+      target: development
+    volumes:
+      - ./client:/var/www
+    environment:
+      GRAPHQL_SERVER_API_URL: http://backend:4000/graphql
+      NEXT_PUBLIC_GRAPHQL_CLIENT_API_URL: http://localhost:4000/graphql
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+  backend:
+    build:
+      context: server
+      target: development
+    volumes:
+      - ./server:/var/www
+    environment:
+      COOKIE_SECRET: some cookie secret
+      WEB_HOST_SERVER: http://web:3000
+      WEB_HOST_CLIENT: http://localhost:3000
+      REDIS_HOST: redis
+      POSTGRES_SOMEENV: someenv
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: lireddit
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - 4000:4000
+    depends_on:
+      - postgres
+      - redis
+  postgres:
+    image: postgres:9.5
+    environment:
+      POSTGRES_DB: lireddit
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+  redis:
+    image: 'redis:alpine'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'

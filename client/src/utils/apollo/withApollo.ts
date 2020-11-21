@@ -3,10 +3,15 @@ import { withApollo as createWithApollo } from 'next-apollo';
 import { NextPageContext } from 'next';
 
 import { PaginatedPosts } from '@generated/graphql';
+import { isServer } from '@utils/isServer';
+
+const API_URL = isServer()
+  ? process.env.GRAPHQL_SERVER_API_URL
+  : process.env.NEXT_PUBLIC_GRAPHQL_CLIENT_API_URL;
 
 const createClient = (ctx?: NextPageContext) =>
   new ApolloClient({
-    uri: 'http://localhost:4000/graphql',
+    uri: API_URL,
     credentials: 'include',
     headers: {
       cookie: ctx?.req?.headers.cookie || '',
