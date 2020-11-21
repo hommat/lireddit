@@ -21,6 +21,7 @@ import { createVoteLoader } from './utils/createVoteLoader';
 let RedisStore = connectRedis(session);
 let redis = new Redis({
   host: process.env.REDIS_HOST,
+  password: process.env.REDIS_PASSWORD,
 });
 
 const main = async () => {
