@@ -38,17 +38,50 @@ export class VoteResolver {
     //@todo validation
     const realValue = value === 1 ? 1 : -1;
 
-    await getConnection().query(
-      `
-      START TRANSACTION;
-      insert into vote ("userId", "postId", value)
-      values (${req.session.userId},${postId},${realValue});
-      update post
-      set points = points + ${realValue}
-      where id = ${postId};
-      COMMIT;
-      `
-    );
+    const { userId } = req.session;
+    const vote = await Vote.findOne({ where: { postId, userId } });
+
+    // Change vote
+    if (vote && vote.value !== realValue) {
+      await getConnection().transaction(async (em) => {
+        const updateVotePromise = em
+          .createQueryBuilder()
+          .update(Vote)
+          .set({ value: realValue })
+          .execute();
+
+        const updatePostPromise = em
+          .createQueryBuilder()
+          .update(Post)
+          .where('id = :postId', { postId })
+          .set({ points: () => `points + ${2 * realValue}` })
+          .execute();
+
+        await Promise.all([updateVotePromise, updatePostPromise]);
+      });
+      //create Vote
+    } else if (!vote) {
+      await getConnection().transaction(async (em) => {
+        const createVotePromise = em
+          .createQueryBuilder()
+          .insert()
+          .into(Vote)
+          .values({ postId, userId, value: realValue })
+          .execute();
+
+        const updatePostPromise = em
+          .createQueryBuilder()
+          .update(Post)
+          .where('id = :postId', { postId })
+          .set({ points: () => `points + ${realValue}` })
+          .execute();
+
+        await Promise.all([createVotePromise, updatePostPromise]);
+      });
+    } else {
+      return false;
+    }
+
     return true;
   }
 }
