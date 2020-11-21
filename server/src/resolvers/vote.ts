@@ -9,7 +9,7 @@ import {
   Int,
 } from 'type-graphql';
 import { Post } from '../entities/Post';
-import { MyContext } from 'src/types';
+import { MyContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
 import { getConnection } from 'typeorm';
 import { Vote } from '../entities/Vote';

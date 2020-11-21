@@ -9,6 +9,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+
 import { User } from './User';
 import { Vote } from './Vote';
 

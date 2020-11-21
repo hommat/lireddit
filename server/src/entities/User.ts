@@ -8,6 +8,7 @@ import {
   BaseEntity,
   OneToMany,
 } from 'typeorm';
+
 import { Post } from './Post';
 import { Vote } from './Vote';
 
