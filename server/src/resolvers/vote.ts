@@ -42,7 +42,7 @@ export class VoteResolver {
       `
       START TRANSACTION;
       insert into vote ("userId", "postId", value)
-      values (${(req.session as any).userId},${postId},${realValue});
+      values (${req.session.userId},${postId},${realValue});
       update post
       set points = points + ${realValue}
       where id = ${postId};

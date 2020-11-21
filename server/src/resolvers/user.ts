@@ -64,7 +64,7 @@ class UserResponse {
 export class UserResolver {
   @FieldResolver(() => String)
   email(@Root() { email, id }: User, @Ctx() { req }: MyContext): string {
-    if ((req.session as any).userId === id) {
+    if (req.session.userId === id) {
       return email;
     }
 
@@ -73,7 +73,7 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true })
   currentUser(@Ctx() { req }: MyContext) {
-    const { userId } = req.session as any;
+    const { userId } = req.session;
     if (!userId) {
       return null;
     }
@@ -111,7 +111,7 @@ export class UserResolver {
     ]);
 
     await User.update({ id: +userId }, { password: hashedPassword });
-    (req.session as any).userId = user.id;
+    req.session.userId = user.id;
 
     return { user };
   }
@@ -163,7 +163,7 @@ export class UserResolver {
       };
     }
 
-    (req.session as any).userId = user.id;
+    req.session.userId = user.id;
 
     return { user };
   }

@@ -88,7 +88,7 @@ export class PostResolver {
     @Arg('createPostInput') createPostInput: CreatePostInput,
     @Ctx() { req }: MyContext
   ): Promise<Post> {
-    const creatorId = (req.session as any).userId;
+    const creatorId = req.session.userId;
 
     return Post.create({ ...createPostInput, creatorId }).save();
   }
