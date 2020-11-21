@@ -51,6 +51,24 @@ export class PostResolver {
     return userLoader.load(creatorId);
   }
 
+  @FieldResolver(() => Int)
+  async voteStatus(
+    @Root() post: Post,
+    @Ctx() { req, voteLoader }: MyContext
+  ): Promise<number> {
+    const { userId } = req.session;
+    if (!userId) {
+      return 0;
+    }
+
+    const vote = await voteLoader.load({
+      postId: post.id,
+      userId,
+    });
+
+    return vote ? vote.value : 0;
+  }
+
   @Query(() => PaginatedPosts)
   async posts(
     @Arg('limit', () => Int) limit: number,

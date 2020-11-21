@@ -47,6 +47,8 @@ export class VoteResolver {
         const updateVotePromise = em
           .createQueryBuilder()
           .update(Vote)
+          .where('postId = :postId', { postId })
+          .andWhere('userId = :userId', { userId })
           .set({ value: realValue })
           .execute();
 

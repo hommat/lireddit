@@ -16,6 +16,7 @@ import { Post } from './entities/Post';
 import { Vote } from './entities/Vote';
 import { User } from './entities/User';
 import { createUserLoader } from './utils/createUserLoader';
+import { createVoteLoader } from './utils/createVoteLoader';
 
 let RedisStore = connectRedis(session);
 let redis = new Redis();
@@ -66,6 +67,7 @@ const main = async () => {
       res,
       redis,
       userLoader: createUserLoader(),
+      voteLoader: createVoteLoader(),
     }),
   });
 

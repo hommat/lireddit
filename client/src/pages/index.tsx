@@ -2,6 +2,9 @@ import Layout from '../components/Layout';
 import { usePostsQuery, useVoteMutation } from '../generated/graphql';
 import { Stack, Box, Heading, Text, Flex, Button, Icon } from '@chakra-ui/core';
 import { withApollo } from '../utils/withApollo';
+import { PostVoteFragment } from '../graphql/types';
+import gql from 'graphql-tag';
+import VoteButton from '../components/VoteButton';
 
 const POST_LIMIT = 3;
 
@@ -23,41 +26,25 @@ export const Index = () => {
     <Layout>
       <Stack p={8}>
         {data &&
-          data.posts.posts.map(
-            ({ id, title, textSnippet, points, creator }) => (
-              <Flex key={id} p={5} shadow="md" borderWidth="1px">
-                <Flex align="center">
-                  <Button
-                    mr={2}
-                    onClick={() =>
-                      vote({
-                        variables: { voteInput: { postId: id, value: 1 } },
-                      })
-                    }
-                  >
-                    +
-                  </Button>
-                  <Box mr={2}>{points}</Box>
-                  <Button
-                    mr={2}
-                    onClick={() =>
-                      vote({
-                        variables: { voteInput: { postId: id, value: -1 } },
-                      })
-                    }
-                  >
-                    -
-                  </Button>
-                </Flex>
-
-                <Box>
-                  <Heading fontSize="xl">{title}</Heading>
-                  <Text mt={2}>By {creator.username}</Text>
-                  <Text mt={4}>{textSnippet}</Text>
-                </Box>
+          data.posts.posts.map((post) => (
+            <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
+              <Flex align="center">
+                <VoteButton post={post} value={1} colorScheme="green">
+                  +
+                </VoteButton>
+                <Box mx={2}>{post.points}</Box>
+                <VoteButton post={post} value={-1} colorScheme="red">
+                  -
+                </VoteButton>
               </Flex>
-            )
-          )}
+
+              <Box>
+                <Heading fontSize="xl">{post.title}</Heading>
+                <Text mt={2}>By {post.creator.username}</Text>
+                <Text mt={4}>{post.textSnippet}</Text>
+              </Box>
+            </Flex>
+          ))}
       </Stack>
       {data && data.posts.hasMore && (
         <Flex justify="center">
