@@ -1,4 +1,4 @@
-import { Formik, Form, FormikHelpers } from 'formik';
+import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
@@ -8,7 +8,6 @@ import { useCreatePostMutation, CreatePostInput } from '../generated/graphql';
 import { useIsAuth } from '../hooks/useIsAuth';
 import { withApollo } from '../utils/apollo/withApollo';
 import { clearCachePosts } from '../utils/apollo/cache';
-import { toErrorMap } from '../utils/errors';
 
 const initialFormValues: CreatePostInput = {
   text: '',
@@ -22,8 +21,8 @@ const CreatePost = ({}) => {
   const [createPost] = useCreatePostMutation();
 
   const handleSubmit = async (
-    createPostInput: CreatePostInput,
-    { setErrors }: FormikHelpers<CreatePostInput>
+    createPostInput: CreatePostInput
+    // { setErrors }: FormikHelpers<CreatePostInput>
   ) => {
     const { data } = await createPost({
       variables: { createPostInput },
@@ -32,8 +31,8 @@ const CreatePost = ({}) => {
 
     if (!data) return;
 
-    const { errors } = data.createPost;
-    if (errors) return setErrors(toErrorMap(errors));
+    // const { errors } = data.createPost;
+    // if (errors) return setErrors(toErrorMap(errors));
 
     router.push('/');
   };
