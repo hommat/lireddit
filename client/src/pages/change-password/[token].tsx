@@ -12,13 +12,17 @@ import {
   Box,
   Link,
 } from '@chakra-ui/core';
-import { useChangePasswordMutation } from '../../generated/graphql';
-import { withUrqlClient } from '../../utils/withUrqlClient';
+import {
+  useChangePasswordMutation,
+  CurrentUserQuery,
+  CurrentUserDocument,
+} from '../../generated/graphql';
 import { useState } from 'react';
+import { withApollo } from '../../utils/withApollo';
 
 const ChangePassword = () => {
   const [tokenError, setTokenError] = useState('');
-  const [, changePassword] = useChangePasswordMutation();
+  const [changePassword] = useChangePasswordMutation();
   const router = useRouter();
   const token = router.query.token as string;
 
@@ -28,7 +32,16 @@ const ChangePassword = () => {
         initialValues={{ password: '' }}
         onSubmit={async (values, { setErrors }) => {
           const { data } = await changePassword({
-            changePasswordInput: { ...values, token },
+            variables: { changePasswordInput: { ...values, token } },
+            update: (cache, { data }) => {
+              cache.writeQuery<CurrentUserQuery>({
+                query: CurrentUserDocument,
+                data: {
+                  __typename: 'Query',
+                  currentUser: data?.changePassword.user,
+                },
+              });
+            },
           });
           if (!data) return;
 
@@ -76,4 +89,4 @@ const ChangePassword = () => {
   );
 };
 
-export default withUrqlClient()(ChangePassword);
+export default withApollo({ ssr: true })(ChangePassword);

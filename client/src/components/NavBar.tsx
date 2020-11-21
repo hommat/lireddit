@@ -2,17 +2,20 @@ import React, { FC } from 'react';
 import { Box, Link, Flex, Heading, Button } from '@chakra-ui/core';
 import NextLink from 'next/link';
 import { useCurrentUserQuery, useLogoutMutation } from '../generated/graphql';
+import { useApolloClient } from '@apollo/client';
 
 interface NavBarProps {}
 
 const NavBar: FC<NavBarProps> = ({}) => {
-  const [{ fetching: logoutFething }, logout] = useLogoutMutation();
-  const [{ data, fetching }] = useCurrentUserQuery();
+  const apolloClient = useApolloClient();
+  const [logout, { loading: logoutLoading }] = useLogoutMutation();
+  const { data, loading } = useCurrentUserQuery();
 
+  console.log(data);
   let body = null;
 
   // data is loading
-  if (fetching) {
+  if (loading) {
     // user not logged in
   } else if (!data?.currentUser) {
     body = (
@@ -30,10 +33,16 @@ const NavBar: FC<NavBarProps> = ({}) => {
     body = (
       <Flex align="center">
         <Box mr={2}>{data.currentUser.username}</Box>
+        <NextLink href="/create-post">
+          <Link>create post</Link>
+        </NextLink>
         <Button
           variant="link"
-          onClick={() => logout()}
-          isLoading={logoutFething}
+          onClick={() => {
+            logout();
+            apolloClient.resetStore();
+          }}
+          isLoading={logoutLoading}
         >
           logout
         </Button>

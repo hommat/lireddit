@@ -1,20 +1,21 @@
 import Layout from '../components/Layout';
-import { withUrqlClient } from '../utils/withUrqlClient';
 import { usePostsQuery, useVoteMutation } from '../generated/graphql';
 import { Stack, Box, Heading, Text, Flex, Button, Icon } from '@chakra-ui/core';
-import { useState } from 'react';
+import { withApollo } from '../utils/withApollo';
 
-const POST_LIMIT = 7;
+const POST_LIMIT = 3;
 
 export const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: POST_LIMIT,
-    cursor: null as string | null,
+  const [vote] = useVoteMutation();
+  const { data, loading, fetchMore, variables } = usePostsQuery({
+    notifyOnNetworkStatusChange: true,
+    variables: {
+      limit: POST_LIMIT,
+      cursor: null as string | null,
+    },
   });
-  const [{}, vote] = useVoteMutation();
-  const [{ data, fetching }] = usePostsQuery({ variables });
 
-  if (!data && !fetching) {
+  if (!data && !loading) {
     return <div>Something went wrong</div>;
   }
 
@@ -29,7 +30,9 @@ export const Index = () => {
                   <Button
                     mr={2}
                     onClick={() =>
-                      vote({ voteInput: { postId: id, value: 1 } })
+                      vote({
+                        variables: { voteInput: { postId: id, value: 1 } },
+                      })
                     }
                   >
                     +
@@ -38,7 +41,9 @@ export const Index = () => {
                   <Button
                     mr={2}
                     onClick={() =>
-                      vote({ voteInput: { postId: id, value: -1 } })
+                      vote({
+                        variables: { voteInput: { postId: id, value: -1 } },
+                      })
                     }
                   >
                     -
@@ -58,12 +63,15 @@ export const Index = () => {
         <Flex justify="center">
           <Button
             onClick={() =>
-              setVariables({
-                ...variables,
-                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt,
+              fetchMore({
+                variables: {
+                  ...variables,
+                  cursor:
+                    data.posts.posts[data.posts.posts.length - 1].createdAt,
+                },
               })
             }
-            isLoading={fetching}
+            isLoading={loading}
           >
             Load more
           </Button>
@@ -73,4 +81,4 @@ export const Index = () => {
   );
 };
 
-export default withUrqlClient({ ssr: true })(Index);
+export default withApollo({ ssr: true })(Index);

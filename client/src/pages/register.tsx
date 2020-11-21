@@ -4,15 +4,19 @@ import { Button } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
 import Layout from '../components/Layout';
-import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
-import { useRegisterMutation, RegisterInput } from '../generated/graphql';
+import {
+  useRegisterMutation,
+  RegisterInput,
+  CurrentUserDocument,
+  CurrentUserQuery,
+} from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
-import { withUrqlClient } from '../utils/withUrqlClient';
+import { withApollo } from '../utils/withApollo';
 
 const Register = ({}) => {
   const router = useRouter();
-  const [, register] = useRegisterMutation();
+  const [register] = useRegisterMutation();
   const initialValues: RegisterInput = {
     username: '',
     password: '',
@@ -24,7 +28,18 @@ const Register = ({}) => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, { setErrors }) => {
-          const { data } = await register({ registerInput: values });
+          const { data } = await register({
+            variables: { registerInput: values },
+            update: (cache, { data }) => {
+              cache.writeQuery<CurrentUserQuery>({
+                query: CurrentUserDocument,
+                data: {
+                  __typename: 'Query',
+                  currentUser: data?.register.user,
+                },
+              });
+            },
+          });
           if (!data) return;
 
           const { errors, user } = data.register;
@@ -68,4 +83,4 @@ const Register = ({}) => {
   );
 };
 
-export default withUrqlClient()(Register);
+export default withApollo({ ssr: true })(Register);

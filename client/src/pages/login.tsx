@@ -5,23 +5,38 @@ import { Button, FormErrorMessage, FormControl, Link } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
 import Layout from '../components/Layout';
-import Wrapper from '../components/Wrapper';
 import InputField from '../components/InputField';
-import { useLoginMutation } from '../generated/graphql';
+import {
+  useLoginMutation,
+  CurrentUserQuery,
+  CurrentUserDocument,
+} from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
-import { withUrqlClient } from '../utils/withUrqlClient';
+import { withApollo } from '../utils/withApollo';
 
 const Login = ({}) => {
   const [credentialsError, setCredentialsError] = useState('');
   const router = useRouter();
-  const [, login] = useLoginMutation();
+  const [login] = useLoginMutation();
 
   return (
     <Layout variant="small">
       <Formik
         initialValues={{ username: '', password: '' }}
         onSubmit={async (values) => {
-          const { data } = await login({ loginInput: values });
+          const { data } = await login({
+            variables: { loginInput: values },
+            update: (cache, { data }) => {
+              cache.writeQuery<CurrentUserQuery>({
+                query: CurrentUserDocument,
+                data: {
+                  __typename: 'Query',
+                  currentUser: data?.login.user,
+                },
+              });
+            },
+          });
+
           if (!data) return;
 
           const { errors, user } = data.login;
@@ -45,12 +60,14 @@ const Login = ({}) => {
               name="username"
               label="Enter username"
               placeholder="Enter username..."
+              autoComplete="true"
             />
             <InputField
               name="password"
               label="Enter password"
               placeholder="Enter password..."
               type="password"
+              autoComplete="true"
             />
             <FormControl isInvalid={!!credentialsError}>
               <FormErrorMessage>{credentialsError}</FormErrorMessage>
@@ -69,4 +86,4 @@ const Login = ({}) => {
   );
 };
 
-export default withUrqlClient()(Login);
+export default withApollo({ ssr: true })(Login);
