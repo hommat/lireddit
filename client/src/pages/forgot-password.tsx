@@ -1,14 +1,14 @@
+import { useState } from 'react';
 import { Formik, Form } from 'formik';
 import { Button, Box } from '@chakra-ui/core';
 
-import Layout from '../components/layout/Layout';
-import InputField from '../components/form/InputField';
+import Layout from '@components/layout/Layout';
+import InputField from '@components/form/InputField';
 import {
   useForgotPasswordMutation,
   MutationForgotPasswordArgs,
-} from '../generated/graphql';
-import { useState } from 'react';
-import { withApollo } from '../utils/apollo/withApollo';
+} from '@generated/graphql';
+import { withApollo } from '@utils/apollo/withApollo';
 
 const initialFormValues: MutationForgotPasswordArgs = {
   email: '',

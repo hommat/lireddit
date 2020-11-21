@@ -10,12 +10,12 @@ import {
   Link,
 } from '@chakra-ui/core';
 
-import Layout from '../../components/layout/Layout';
-import InputField from '../../components/form/InputField';
-import { toErrorMap } from '../../utils/errors';
-import { withApollo } from '../../utils/apollo/withApollo';
-import { useChangePasswordMutation } from '../../generated/graphql';
-import { setCacheCurrentUser, clearCachePosts } from '../../utils/apollo/cache';
+import Layout from '@components/layout/Layout';
+import InputField from '@components/form/InputField';
+import { useChangePasswordMutation } from '@generated/graphql';
+import { setCacheCurrentUser, clearCachePosts } from '@utils/apollo/cache';
+import { withApollo } from '@utils/apollo/withApollo';
+import { toErrorMap } from '@utils/errors';
 
 interface ChangePasswordFormValues {
   password: string;

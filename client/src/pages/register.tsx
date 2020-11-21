@@ -3,12 +3,12 @@ import { Formik, Form, FormikHelpers } from 'formik';
 import { Button } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
-import Layout from '../components/layout/Layout';
-import InputField from '../components/form/InputField';
-import { useRegisterMutation, RegisterInput } from '../generated/graphql';
-import { toErrorMap } from '../utils/errors';
-import { withApollo } from '../utils/apollo/withApollo';
-import { setCacheCurrentUser, clearCachePosts } from '../utils/apollo/cache';
+import Layout from '@components/layout/Layout';
+import InputField from '@components/form/InputField';
+import { useRegisterMutation, RegisterInput } from '@generated/graphql';
+import { toErrorMap } from '@utils/errors';
+import { withApollo } from '@utils/apollo/withApollo';
+import { setCacheCurrentUser, clearCachePosts } from '@utils/apollo/cache';
 
 const initialFormValues: RegisterInput = {
   username: '',

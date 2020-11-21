@@ -2,14 +2,14 @@ import React, { FC } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { Box, Flex, Button } from '@chakra-ui/core';
-
 import { useApolloClient } from '@apollo/client';
+
 import {
   useLogoutMutation,
   useCurrentUserQuery,
   CurrentUserQuery,
   CurrentUserDocument,
-} from '../../generated/graphql';
+} from '@generated/graphql';
 
 interface NavLoggedInProps {}
 

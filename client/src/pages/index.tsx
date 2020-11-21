@@ -1,10 +1,10 @@
 import { Heading, Stack } from '@chakra-ui/core';
 
-import Layout from '../components/layout/Layout';
-import PostList from '../components/post/PostList';
-import PostFetchMore from '../components/post/PostFetchMore';
-import { usePostsQuery } from '../generated/graphql';
-import { withApollo } from '../utils/apollo/withApollo';
+import Layout from '@components/layout/Layout';
+import PostList from '@components/post/PostList';
+import PostFetchMore from '@components/post/PostFetchMore';
+import { usePostsQuery } from '@generated/graphql';
+import { withApollo } from '@utils/apollo/withApollo';
 
 const POST_LIMIT = 3;
 

@@ -4,12 +4,12 @@ import { Formik, Form } from 'formik';
 import { Button, FormErrorMessage, FormControl, Link } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
-import Layout from '../components/layout/Layout';
-import InputField from '../components/form/InputField';
-import { useLoginMutation, LoginInput } from '../generated/graphql';
-import { toErrorMap } from '../utils/errors';
-import { withApollo } from '../utils/apollo/withApollo';
-import { setCacheCurrentUser, clearCachePosts } from '../utils/apollo/cache';
+import Layout from '@components/layout/Layout';
+import InputField from '@components/form/InputField';
+import { useLoginMutation, LoginInput } from '@generated/graphql';
+import { toErrorMap } from '@utils/errors';
+import { withApollo } from '@utils/apollo/withApollo';
+import { setCacheCurrentUser, clearCachePosts } from '@utils/apollo/cache';
 
 const initialFormValues: LoginInput = {
   username: '',

@@ -2,12 +2,12 @@ import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
-import Layout from '../components/layout/Layout';
-import InputField from '../components/form/InputField';
-import { useCreatePostMutation, CreatePostInput } from '../generated/graphql';
-import { useIsAuth } from '../hooks/useIsAuth';
-import { withApollo } from '../utils/apollo/withApollo';
-import { clearCachePosts } from '../utils/apollo/cache';
+import Layout from '@components/layout/Layout';
+import InputField from '@components/form/InputField';
+import { useCreatePostMutation, CreatePostInput } from '@generated/graphql';
+import { useIsAuth } from '@hooks/useIsAuth';
+import { withApollo } from '@utils/apollo/withApollo';
+import { clearCachePosts } from '@utils/apollo/cache';
 
 const initialFormValues: CreatePostInput = {
   text: '',

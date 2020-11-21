@@ -4,7 +4,7 @@ import { Box, Link, Flex, Heading } from '@chakra-ui/core';
 
 import NavLoggedIn from './NavLoggedIn';
 import NavLoggedOut from './NavLoggedOut';
-import { useCurrentUserQuery } from '../../generated/graphql';
+import { useCurrentUserQuery } from '@generated/graphql';
 
 interface HeaderProps {}
 

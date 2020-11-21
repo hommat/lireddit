@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { Stack } from '@chakra-ui/core';
 
-import PostListItem from '../post/PostListItem';
-import { PostSnippetFragment } from '../../generated/graphql';
+import PostListItem from './PostListItem';
+import { PostSnippetFragment } from '@generated/graphql';
 
 interface PostListProps {
   posts: PostSnippetFragment[];

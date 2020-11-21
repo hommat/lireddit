@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import { Flex, Box, Button } from '@chakra-ui/core';
-
-import { PostSnippetFragment, useVoteMutation } from '../../generated/graphql';
 import { gql } from '@apollo/client';
-import { PostVoteFragment } from '../../graphql/types';
+
+import { PostSnippetFragment, useVoteMutation } from '@generated/graphql';
+import { PostVoteFragment } from '@graphql/types';
 
 interface PostVoteColumnProps {
   post: PostSnippetFragment;

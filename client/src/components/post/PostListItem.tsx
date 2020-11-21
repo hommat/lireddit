@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { Flex, Box, Heading, Text } from '@chakra-ui/core';
 
-import PostVoteColumn from '../post/PostVoteColumn';
-import { PostSnippetFragment } from '../../generated/graphql';
+import PostVoteColumn from './PostVoteColumn';
+import { PostSnippetFragment } from '@generated/graphql';
 
 interface PostListItemProps {
   post: PostSnippetFragment;

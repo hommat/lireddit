@@ -4,7 +4,7 @@ import {
   CurrentUserQuery,
   CurrentUserDocument,
   User,
-} from '../../generated/graphql';
+} from '@generated/graphql';
 
 type NewCurrentUser = Pick<User, 'id' | 'username'> | null | undefined;
 

@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { withApollo as createWithApollo } from 'next-apollo';
 import { NextPageContext } from 'next';
 
-import { PaginatedPosts } from '../../generated/graphql';
+import { PaginatedPosts } from '@generated/graphql';
 
 const createClient = (ctx?: NextPageContext) =>
   new ApolloClient({
