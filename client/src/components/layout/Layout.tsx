@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import NavBar from './NavBar';
+import Header from './Header';
 import Wrapper, { WrapperProps } from './Wrapper';
 
 interface LayoutProps extends WrapperProps {}
@@ -8,7 +8,7 @@ interface LayoutProps extends WrapperProps {}
 const Layout: FC<LayoutProps> = ({ children, ...wrapperProps }) => {
   return (
     <div>
-      <NavBar />
+      <Header />
       <Wrapper {...wrapperProps}>{children}</Wrapper>
     </div>
   );

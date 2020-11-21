@@ -1,9 +1,9 @@
+import { AppProps } from 'next/app';
 import { CSSReset, ThemeProvider } from '@chakra-ui/core';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import theme from '../theme';
-import { PaginatedPosts } from '../generated/graphql';
 
-function MyApp({ Component, pageProps }: any) {
+import theme from '../chakra/theme';
+
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={theme}>
       <CSSReset />

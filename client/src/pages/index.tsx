@@ -1,15 +1,14 @@
-import Layout from '../components/Layout';
-import { usePostsQuery, useVoteMutation } from '../generated/graphql';
-import { Stack, Box, Heading, Text, Flex, Button, Icon } from '@chakra-ui/core';
-import { withApollo } from '../utils/withApollo';
-import { PostVoteFragment } from '../graphql/types';
-import gql from 'graphql-tag';
-import VoteButton from '../components/VoteButton';
+import { Heading, Stack } from '@chakra-ui/core';
+
+import Layout from '../components/layout/Layout';
+import PostList from '../components/post/PostList';
+import PostFetchMore from '../components/post/PostFetchMore';
+import { usePostsQuery } from '../generated/graphql';
+import { withApollo } from '../utils/apollo/withApollo';
 
 const POST_LIMIT = 3;
 
 export const Index = () => {
-  const [vote] = useVoteMutation();
   const { data, loading, fetchMore, variables } = usePostsQuery({
     notifyOnNetworkStatusChange: true,
     variables: {
@@ -18,51 +17,29 @@ export const Index = () => {
     },
   });
 
+  const handleFetchMore = () => {
+    fetchMore({
+      variables: {
+        ...variables,
+        cursor: data!.posts.posts[data!.posts.posts.length - 1].createdAt,
+      },
+    });
+  };
+
   if (!data && !loading) {
-    return <div>Something went wrong</div>;
+    return (
+      <Layout>
+        <Heading textAlign="center">Something went wrong...</Heading>
+      </Layout>
+    );
   }
 
   return (
     <Layout>
-      <Stack p={8}>
-        {data &&
-          data.posts.posts.map((post) => (
-            <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
-              <Flex align="center">
-                <VoteButton post={post} value={1} colorScheme="green">
-                  +
-                </VoteButton>
-                <Box mx={2}>{post.points}</Box>
-                <VoteButton post={post} value={-1} colorScheme="red">
-                  -
-                </VoteButton>
-              </Flex>
+      <Stack p={8}>{data && <PostList posts={data.posts.posts} />}</Stack>
 
-              <Box>
-                <Heading fontSize="xl">{post.title}</Heading>
-                <Text mt={2}>By {post.creator.username}</Text>
-                <Text mt={4}>{post.textSnippet}</Text>
-              </Box>
-            </Flex>
-          ))}
-      </Stack>
       {data && data.posts.hasMore && (
-        <Flex justify="center">
-          <Button
-            onClick={() =>
-              fetchMore({
-                variables: {
-                  ...variables,
-                  cursor:
-                    data.posts.posts[data.posts.posts.length - 1].createdAt,
-                },
-              })
-            }
-            isLoading={loading}
-          >
-            Load more
-          </Button>
-        </Flex>
+        <PostFetchMore loading={loading} onFetchMore={handleFetchMore} />
       )}
     </Layout>
   );

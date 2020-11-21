@@ -1,4 +1,5 @@
 import React, { InputHTMLAttributes, FC } from 'react';
+import { useField } from 'formik';
 import {
   FormControl,
   FormLabel,
@@ -6,7 +7,6 @@ import {
   FormErrorMessage,
   Textarea,
 } from '@chakra-ui/core';
-import { useField } from 'formik';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;

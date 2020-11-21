@@ -21,8 +21,6 @@ export const createVoteLoader = () =>
       {}
     );
 
-    console.log(votesRecord);
-
     return voteDataLoaderInputs.map(
       (input) => votesRecord[createVoteLoaderId(input)]
     );

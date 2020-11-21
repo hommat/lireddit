@@ -1,58 +1,47 @@
 import React from 'react';
-import { Formik, Form } from 'formik';
+import { Formik, Form, FormikHelpers } from 'formik';
 import { Button } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
-import Layout from '../components/Layout';
-import InputField from '../components/InputField';
-import {
-  useRegisterMutation,
-  RegisterInput,
-  CurrentUserDocument,
-  CurrentUserQuery,
-} from '../generated/graphql';
+import Layout from '../components/layout/Layout';
+import InputField from '../components/form/InputField';
+import { useRegisterMutation, RegisterInput } from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
-import { withApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/apollo/withApollo';
+import { setCacheCurrentUser, clearCachePosts } from '../utils/apollo/cache';
+
+const initialFormValues: RegisterInput = {
+  username: '',
+  password: '',
+  email: '',
+};
 
 const Register = ({}) => {
   const router = useRouter();
   const [register] = useRegisterMutation();
-  const initialValues: RegisterInput = {
-    username: '',
-    password: '',
-    email: '',
+
+  const handleSubmit = async (
+    registerInput: RegisterInput,
+    { setErrors }: FormikHelpers<RegisterInput>
+  ) => {
+    const { data } = await register({
+      variables: { registerInput },
+      update: (cache, { data }) => {
+        setCacheCurrentUser(cache, data?.register.user);
+        clearCachePosts(cache);
+      },
+    });
+    if (!data) return;
+
+    const { errors } = data.register;
+    if (errors) return setErrors(toErrorMap(errors));
+
+    router.push('/');
   };
 
   return (
     <Layout variant="small">
-      <Formik
-        initialValues={initialValues}
-        onSubmit={async (values, { setErrors }) => {
-          const { data } = await register({
-            variables: { registerInput: values },
-            update: (cache, { data }) => {
-              cache.writeQuery<CurrentUserQuery>({
-                query: CurrentUserDocument,
-                data: {
-                  __typename: 'Query',
-                  currentUser: data?.register.user,
-                },
-              });
-            },
-          });
-          if (!data) return;
-
-          const { errors, user } = data.register;
-
-          if (errors) {
-            return setErrors(toErrorMap(errors));
-          }
-
-          if (user) {
-            router.push('/');
-          }
-        }}
-      >
+      <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form>
             <InputField

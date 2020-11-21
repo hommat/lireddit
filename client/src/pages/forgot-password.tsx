@@ -1,36 +1,36 @@
-import Layout from '../components/Layout';
-import Wrapper from '../components/Wrapper';
 import { Formik, Form } from 'formik';
-import InputField from '../components/InputField';
+import { Button, Box } from '@chakra-ui/core';
+
+import Layout from '../components/layout/Layout';
+import InputField from '../components/form/InputField';
 import {
-  FormControl,
-  FormErrorMessage,
-  Button,
-  Link,
-  Box,
-} from '@chakra-ui/core';
-import { useForgotPasswordMutation } from '../generated/graphql';
+  useForgotPasswordMutation,
+  MutationForgotPasswordArgs,
+} from '../generated/graphql';
 import { useState } from 'react';
-import { withApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/apollo/withApollo';
+
+const initialFormValues: MutationForgotPasswordArgs = {
+  email: '',
+};
 
 const ForgotPassword = ({}) => {
   const [message, setMessage] = useState('');
   const [forgotPassword] = useForgotPasswordMutation();
+
+  const handleSubmit = async (formValues: MutationForgotPasswordArgs) => {
+    const { data } = await forgotPassword({ variables: formValues });
+    if (!data) return;
+
+    return setMessage(data.forgotPassword);
+  };
 
   return (
     <Layout variant="small">
       {message ? (
         <Box>{message}</Box>
       ) : (
-        <Formik
-          initialValues={{ email: '' }}
-          onSubmit={async (values) => {
-            const { data } = await forgotPassword({ variables: values });
-            if (!data) return;
-
-            return setMessage(data.forgotPassword);
-          }}
-        >
+        <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
           {({ isSubmitting }) => (
             <Form>
               <InputField
@@ -50,4 +50,4 @@ const ForgotPassword = ({}) => {
   );
 };
 
-export default withApollo({ ssr: true })(ForgotPassword);
+export default withApollo({ ssr: false })(ForgotPassword);

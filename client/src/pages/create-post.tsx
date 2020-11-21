@@ -1,32 +1,46 @@
-import Layout from '../components/Layout';
-import { Formik, Form } from 'formik';
-import InputField from '../components/InputField';
+import { Formik, Form, FormikHelpers } from 'formik';
 import { Button } from '@chakra-ui/core';
-import { useCreatePostMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
+
+import Layout from '../components/layout/Layout';
+import InputField from '../components/form/InputField';
+import { useCreatePostMutation, CreatePostInput } from '../generated/graphql';
 import { useIsAuth } from '../hooks/useIsAuth';
-import { withApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/apollo/withApollo';
+import { clearCachePosts } from '../utils/apollo/cache';
+import { toErrorMap } from '../utils/errors';
+
+const initialFormValues: CreatePostInput = {
+  text: '',
+  title: '',
+};
 
 const CreatePost = ({}) => {
+  useIsAuth();
+
   const router = useRouter();
   const [createPost] = useCreatePostMutation();
 
-  useIsAuth();
+  const handleSubmit = async (
+    createPostInput: CreatePostInput,
+    { setErrors }: FormikHelpers<CreatePostInput>
+  ) => {
+    const { data } = await createPost({
+      variables: { createPostInput },
+      update: clearCachePosts,
+    });
+
+    if (!data) return;
+
+    const { errors } = data.createPost;
+    if (errors) return setErrors(toErrorMap(errors));
+
+    router.push('/');
+  };
 
   return (
     <Layout variant="small">
-      <Formik
-        initialValues={{ title: '', text: '' }}
-        onSubmit={async (values) => {
-          await createPost({
-            variables: { createPostInput: values },
-            update: (cache) => {
-              cache.evict({ fieldName: 'posts:{}' });
-            },
-          });
-          router.push('/');
-        }}
-      >
+      <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form>
             <InputField

@@ -4,56 +4,50 @@ import { Formik, Form } from 'formik';
 import { Button, FormErrorMessage, FormControl, Link } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
 
-import Layout from '../components/Layout';
-import InputField from '../components/InputField';
-import {
-  useLoginMutation,
-  CurrentUserQuery,
-  CurrentUserDocument,
-} from '../generated/graphql';
+import Layout from '../components/layout/Layout';
+import InputField from '../components/form/InputField';
+import { useLoginMutation, LoginInput } from '../generated/graphql';
 import { toErrorMap } from '../utils/errors';
-import { withApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/apollo/withApollo';
+import { setCacheCurrentUser, clearCachePosts } from '../utils/apollo/cache';
+
+const initialFormValues: LoginInput = {
+  username: '',
+  password: '',
+};
 
 const Login = ({}) => {
   const [credentialsError, setCredentialsError] = useState('');
   const router = useRouter();
   const [login] = useLoginMutation();
 
+  const handleSubmit = async (loginInput: LoginInput) => {
+    const { data } = await login({
+      variables: { loginInput },
+      update: (cache, { data }) => {
+        setCacheCurrentUser(cache, data?.login.user);
+        clearCachePosts(cache);
+      },
+    });
+
+    if (!data) return;
+
+    const { errors } = data.login;
+
+    if (errors) {
+      const errorsMap = toErrorMap(errors);
+      return setCredentialsError(errorsMap.credentials || '');
+    }
+
+    const { next } = router.query;
+    const nextRoute = typeof next === 'string' ? next : '/';
+
+    router.push(nextRoute);
+  };
+
   return (
     <Layout variant="small">
-      <Formik
-        initialValues={{ username: '', password: '' }}
-        onSubmit={async (values) => {
-          const { data } = await login({
-            variables: { loginInput: values },
-            update: (cache, { data }) => {
-              cache.writeQuery<CurrentUserQuery>({
-                query: CurrentUserDocument,
-                data: {
-                  __typename: 'Query',
-                  currentUser: data?.login.user,
-                },
-              });
-            },
-          });
-
-          if (!data) return;
-
-          const { errors, user } = data.login;
-
-          if (errors) {
-            const errorsMap = toErrorMap(errors);
-            return setCredentialsError(errorsMap.credentials || '');
-          }
-
-          if (user) {
-            const { next } = router.query;
-            const nextRoute = typeof next === 'string' ? next : '/';
-
-            router.push(nextRoute);
-          }
-        }}
-      >
+      <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form>
             <InputField

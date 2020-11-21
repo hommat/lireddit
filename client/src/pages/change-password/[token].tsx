@@ -1,10 +1,7 @@
-import { useRouter } from 'next/router';
 import NextLink from 'next/link';
-import Layout from '../../components/Layout';
-import Wrapper from '../../components/Wrapper';
-import { Formik, Form } from 'formik';
-import { toErrorMap } from '../../utils/errors';
-import InputField from '../../components/InputField';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { Formik, Form, FormikHelpers } from 'formik';
 import {
   FormControl,
   FormErrorMessage,
@@ -12,13 +9,21 @@ import {
   Box,
   Link,
 } from '@chakra-ui/core';
-import {
-  useChangePasswordMutation,
-  CurrentUserQuery,
-  CurrentUserDocument,
-} from '../../generated/graphql';
-import { useState } from 'react';
-import { withApollo } from '../../utils/withApollo';
+
+import Layout from '../../components/layout/Layout';
+import InputField from '../../components/form/InputField';
+import { toErrorMap } from '../../utils/errors';
+import { withApollo } from '../../utils/apollo/withApollo';
+import { useChangePasswordMutation } from '../../generated/graphql';
+import { setCacheCurrentUser, clearCachePosts } from '../../utils/apollo/cache';
+
+interface ChangePasswordFormValues {
+  password: string;
+}
+
+const initialFormValues: ChangePasswordFormValues = {
+  password: '',
+};
 
 const ChangePassword = () => {
   const [tokenError, setTokenError] = useState('');
@@ -26,39 +31,34 @@ const ChangePassword = () => {
   const router = useRouter();
   const token = router.query.token as string;
 
+  const handleSubmit = async (
+    values: ChangePasswordFormValues,
+    { setErrors }: FormikHelpers<ChangePasswordFormValues>
+  ) => {
+    const { data } = await changePassword({
+      variables: { changePasswordInput: { ...values, token } },
+      update: (cache, { data }) => {
+        setCacheCurrentUser(cache, data?.changePassword.user);
+        clearCachePosts(cache);
+      },
+    });
+
+    if (!data) return;
+    const { errors } = data.changePassword;
+
+    if (errors) {
+      const errorMap = toErrorMap(errors);
+
+      setTokenError(tokenError || '');
+      return setErrors(errorMap);
+    }
+
+    router.push('/');
+  };
+
   return (
     <Layout variant="small">
-      <Formik
-        initialValues={{ password: '' }}
-        onSubmit={async (values, { setErrors }) => {
-          const { data } = await changePassword({
-            variables: { changePasswordInput: { ...values, token } },
-            update: (cache, { data }) => {
-              cache.writeQuery<CurrentUserQuery>({
-                query: CurrentUserDocument,
-                data: {
-                  __typename: 'Query',
-                  currentUser: data?.changePassword.user,
-                },
-              });
-            },
-          });
-          if (!data) return;
-
-          const { errors, user } = data.changePassword;
-
-          if (errors) {
-            const { token: tokenError, ...rest } = toErrorMap(errors);
-
-            setTokenError(tokenError || '');
-            return setErrors(rest);
-          }
-
-          if (user) {
-            router.push('/');
-          }
-        }}
-      >
+      <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form>
             <InputField
@@ -89,4 +89,4 @@ const ChangePassword = () => {
   );
 };
 
-export default withApollo({ ssr: true })(ChangePassword);
+export default withApollo({ ssr: false })(ChangePassword);
