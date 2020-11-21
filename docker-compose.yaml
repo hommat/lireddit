@@ -24,7 +24,7 @@ services:
       WEB_HOST_SERVER: http://web:3000
       WEB_HOST_CLIENT: http://localhost:3000
       REDIS_HOST: redis
-      POSTGRES_SOMEENV: someenv
+      REDIS_PASSWORD: password123
       POSTGRES_HOST: postgres
       POSTGRES_DB: lireddit
       POSTGRES_USER: user
@@ -45,6 +45,6 @@ services:
   redis:
     image: 'redis:alpine'
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_PASSWORD=password123
     ports:
       - '6379:6379'

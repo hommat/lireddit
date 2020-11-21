@@ -6,6 +6,7 @@ declare global {
       WEB_HOST_SERVER: string;
       WEB_HOST_CLIENT: string;
       REDIS_HOST: string;
+      REDIS_PASSWORD: string;
       POSTGRES_SOMEENV: string;
       POSTGRES_HOST: string;
       POSTGRES_DB: string;
