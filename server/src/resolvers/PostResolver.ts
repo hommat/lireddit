@@ -13,7 +13,7 @@ import {
   ObjectType,
 } from 'type-graphql';
 import { Post } from '../entities/Post';
-import { MyContext } from '../types';
+import { AppContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
 import { getCustomRepository } from 'typeorm';
 import { User } from '../entities/User';
@@ -47,7 +47,7 @@ export class PostResolver {
   @FieldResolver(() => User)
   async creator(
     @Root() { creatorId }: Post,
-    @Ctx() { userLoader }: MyContext
+    @Ctx() { userLoader }: AppContext
   ): Promise<User> {
     return userLoader.load(creatorId);
   }
@@ -55,7 +55,7 @@ export class PostResolver {
   @FieldResolver(() => Int)
   async voteStatus(
     @Root() post: Post,
-    @Ctx() { req, voteLoader }: MyContext
+    @Ctx() { req, voteLoader }: AppContext
   ): Promise<number> {
     const { userId } = req.session;
     if (!userId) {
@@ -97,7 +97,7 @@ export class PostResolver {
   @UseMiddleware(isAuth)
   async createPost(
     @Arg('createPostInput') createPostInput: CreatePostInput,
-    @Ctx() { req }: MyContext
+    @Ctx() { req }: AppContext
   ): Promise<Post> {
     const creatorId = req.session.userId;
 

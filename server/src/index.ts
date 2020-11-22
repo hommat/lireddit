@@ -8,7 +8,7 @@ import { PostResolver } from './resolvers/PostResolver';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-import { MyContext } from './types';
+import { AppContext } from './types';
 import cors from 'cors';
 import { createConnection } from 'typeorm';
 import { VoteResolver } from './resolvers/VoteResolver';
@@ -66,7 +66,7 @@ const main = async () => {
       resolvers: [UserResolver, PostResolver, VoteResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({
+    context: ({ req, res }): AppContext => ({
       req,
       res,
       redis,

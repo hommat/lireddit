@@ -8,7 +8,7 @@ import {
   UseMiddleware,
   Int,
 } from 'type-graphql';
-import { MyContext } from '../types';
+import { AppContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
 import { getConnection } from 'typeorm';
 import { Vote } from '../entities/Vote';
@@ -29,7 +29,7 @@ export class VoteResolver {
   @UseMiddleware(isAuth)
   async vote(
     @Arg('voteInput', () => VoteInput) { postId, value }: VoteInput,
-    @Ctx() { req }: MyContext
+    @Ctx() { req }: AppContext
   ): Promise<boolean> {
     //@todo validation
     const realValue = value === 1 ? 1 : -1;

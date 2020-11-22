@@ -10,7 +10,7 @@ import {
   FieldResolver,
   Root,
 } from 'type-graphql';
-import { MyContext } from '../types';
+import { AppContext } from '../types';
 import { User } from '../entities/User';
 import argon2 from 'argon2';
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants';
@@ -62,7 +62,7 @@ class UserResponse {
 @Resolver(User)
 export class UserResolver {
   @FieldResolver(() => String)
-  email(@Root() { email, id }: User, @Ctx() { req }: MyContext): string {
+  email(@Root() { email, id }: User, @Ctx() { req }: AppContext): string {
     if (req.session.userId === id) {
       return email;
     }
@@ -71,7 +71,7 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  currentUser(@Ctx() { req }: MyContext) {
+  currentUser(@Ctx() { req }: AppContext) {
     const { userId } = req.session;
     if (!userId) {
       return null;
@@ -83,7 +83,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg('changePasswordInput') { token, password }: ChangePasswordInput,
-    @Ctx() { redis, req }: MyContext
+    @Ctx() { redis, req }: AppContext
   ): Promise<UserResponse> {
     const tokenKey = FORGOT_PASSWORD_PREFIX + token;
 
@@ -118,7 +118,7 @@ export class UserResolver {
   @Mutation(() => String)
   async forgotPassword(
     @Arg('email') email: string,
-    @Ctx() { redis }: MyContext
+    @Ctx() { redis }: AppContext
   ): Promise<string> {
     const user = await User.findOne({ where: { email } });
 
@@ -143,7 +143,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('registerInput') { username, password, email }: RegisterInput,
-    @Ctx() { req }: MyContext
+    @Ctx() { req }: AppContext
   ): Promise<UserResponse> {
     const hashedPassword = await argon2.hash(password);
     let user;
@@ -170,7 +170,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg('loginInput') { username, password }: LoginInput,
-    @Ctx() { req }: MyContext
+    @Ctx() { req }: AppContext
   ): Promise<UserResponse> {
     const user = await User.findOne({ where: { username } });
     if (!user) {
@@ -196,7 +196,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  logout(@Ctx() { req, res }: MyContext) {
+  logout(@Ctx() { req, res }: AppContext) {
     res.clearCookie(COOKIE_NAME);
 
     return new Promise((resolve) =>

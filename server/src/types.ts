@@ -10,7 +10,7 @@ interface AppSessionData extends Partial<SessionData> {
   userId?: number;
 }
 
-export interface MyContext {
+export interface AppContext {
   req: Request & { session: Session & AppSessionData };
   res: Response;
   redis: Redis;
