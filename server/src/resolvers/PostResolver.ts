@@ -3,128 +3,56 @@ import {
   Query,
   Arg,
   Mutation,
-  InputType,
-  Field,
   Ctx,
   UseMiddleware,
   Int,
   FieldResolver,
   Root,
-  ObjectType,
 } from 'type-graphql';
 import { Post } from '../entities/Post';
 import { AppContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
-import { getCustomRepository } from 'typeorm';
 import { User } from '../entities/User';
-import { PostRepository } from '../repositories/PostRepository';
-
-@InputType()
-class CreatePostInput {
-  @Field()
-  title: string;
-
-  @Field()
-  text: string;
-}
-
-@ObjectType()
-class PaginatedPosts {
-  @Field(() => [Post])
-  posts: Post[];
-
-  @Field()
-  hasMore: boolean;
-}
+import { PostService } from '../services/PostService';
+import { PaginatedPosts, CreatePostInput } from '../types/post';
 
 @Resolver(Post)
 export class PostResolver {
+  private readonly postService: PostService;
+
+  constructor() {
+    this.postService = new PostService();
+  }
+
   @FieldResolver(() => String)
   textSnippet(@Root() post: Post): string {
-    return post.text.slice(0, 50) + '...';
+    return this.postService.getPostTextSnippet(post);
   }
 
   @FieldResolver(() => User)
-  async creator(
-    @Root() { creatorId }: Post,
-    @Ctx() { userLoader }: AppContext
-  ): Promise<User> {
-    return userLoader.load(creatorId);
+  creator(@Root() post: Post, @Ctx() ctx: AppContext): Promise<User> {
+    return this.postService.getPostCreator(post, ctx);
   }
 
   @FieldResolver(() => Int)
-  async voteStatus(
-    @Root() post: Post,
-    @Ctx() { req, voteLoader }: AppContext
-  ): Promise<number> {
-    const { userId } = req.session;
-    if (!userId) {
-      return 0;
-    }
-
-    const vote = await voteLoader.load({
-      postId: post.id,
-      userId,
-    });
-
-    return vote ? vote.value : 0;
+  voteStatus(@Root() post: Post, @Ctx() ctx: AppContext): Promise<number> {
+    return this.postService.getPostVoteStatus(post, ctx);
   }
 
   @Query(() => PaginatedPosts)
-  async posts(
+  posts(
     @Arg('limit', () => Int) limit: number,
     @Arg('cursor', () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedPosts> {
-    const realLimit = Math.min(limit, 50);
-    const realLimitPlusOne = realLimit + 1;
-    const posts = await getCustomRepository(PostRepository).getPaginated(
-      realLimit,
-      cursor
-    );
-
-    return {
-      posts: posts.slice(0, realLimit),
-      hasMore: posts.length === realLimitPlusOne,
-    };
-  }
-
-  @Query(() => Post, { nullable: true })
-  post(@Arg('id') id: number): Promise<Post | undefined> {
-    return Post.findOne(id);
+    return this.postService.getPaginatedPosts(limit, cursor);
   }
 
   @Mutation(() => Post)
   @UseMiddleware(isAuth)
   async createPost(
-    @Arg('createPostInput') createPostInput: CreatePostInput,
-    @Ctx() { req }: AppContext
+    @Arg('createPostInput') input: CreatePostInput,
+    @Ctx() ctx: AppContext
   ): Promise<Post> {
-    const creatorId = req.session.userId;
-
-    return Post.create({ ...createPostInput, creatorId }).save();
-  }
-
-  @Mutation(() => Post, { nullable: true })
-  async updatePost(
-    @Arg('id') id: number,
-    @Arg('title', () => String, { nullable: true }) title: string
-  ): Promise<Post | null> {
-    const post = await Post.findOne(id);
-
-    if (!post) {
-      return null;
-    }
-
-    if (typeof title !== 'undefined') {
-      await Post.update({ id }, { title });
-    }
-
-    return post;
-  }
-
-  @Mutation(() => Boolean)
-  async deletePost(@Arg('id') id: number): Promise<boolean> {
-    await Post.delete(id);
-    return true;
+    return this.postService.createPost(input, ctx);
   }
 }
