@@ -3,204 +3,73 @@ import {
   Ctx,
   Arg,
   Mutation,
-  InputType,
-  Field,
-  ObjectType,
   Query,
   FieldResolver,
   Root,
 } from 'type-graphql';
+
 import { AppContext } from '../types';
 import { User } from '../entities/User';
-import argon2 from 'argon2';
-import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants';
-import { sendEmail } from '../utils/sendEmail';
-import { v4 } from 'uuid';
-
-@InputType()
-class LoginInput {
-  @Field()
-  username: string;
-
-  @Field()
-  password: string;
-}
-
-@InputType()
-class RegisterInput extends LoginInput {
-  @Field()
-  email: string;
-}
-
-@InputType()
-class ChangePasswordInput {
-  @Field()
-  password: string;
-
-  @Field()
-  token: string;
-}
-
-@ObjectType()
-class FieldError {
-  @Field()
-  field: string;
-
-  @Field()
-  message: string;
-}
-
-@ObjectType()
-class UserResponse {
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
-
-  @Field(() => User, { nullable: true })
-  user?: User;
-}
+import {
+  UserResponse,
+  ChangePasswordInput,
+  RegisterInput,
+  LoginInput,
+} from '../types/user';
+import { UserService } from '../services/UserService';
 
 @Resolver(User)
 export class UserResolver {
-  @FieldResolver(() => String)
-  email(@Root() { email, id }: User, @Ctx() { req }: AppContext): string {
-    if (req.session.userId === id) {
-      return email;
-    }
+  private readonly userService: UserService;
 
-    return '';
+  constructor() {
+    this.userService = new UserService();
+  }
+
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() ctx: AppContext): string {
+    return this.userService.getUserEmail(user, ctx);
   }
 
   @Query(() => User, { nullable: true })
-  currentUser(@Ctx() { req }: AppContext) {
-    const { userId } = req.session;
-    if (!userId) {
-      return null;
-    }
-
-    return User.findOne(userId);
+  currentUser(@Ctx() ctx: AppContext) {
+    return this.userService.getCurrentUser(ctx);
   }
 
   @Mutation(() => UserResponse)
   async changePassword(
-    @Arg('changePasswordInput') { token, password }: ChangePasswordInput,
-    @Ctx() { redis, req }: AppContext
+    @Arg('changePasswordInput') input: ChangePasswordInput,
+    @Ctx() ctx: AppContext
   ): Promise<UserResponse> {
-    const tokenKey = FORGOT_PASSWORD_PREFIX + token;
-
-    let userId = await redis.get(tokenKey);
-    if (!userId) {
-      return {
-        errors: [{ field: 'token', message: 'Token is not valid' }],
-      };
-    }
-
-    const user = await User.findOne(+userId);
-    if (!user) {
-      return {
-        errors: [{ field: 'token', message: 'User not longer exists' }],
-      };
-    }
-
-    const hashPasswordPromise = argon2.hash(password);
-    const deleteTokenPromise = redis.del(tokenKey);
-
-    const [hashedPassword] = await Promise.all([
-      hashPasswordPromise,
-      deleteTokenPromise,
-    ]);
-
-    await User.update({ id: +userId }, { password: hashedPassword });
-    req.session.userId = user.id;
-
-    return { user };
+    return this.userService.changePassword(input, ctx);
   }
 
   @Mutation(() => String)
   async forgotPassword(
     @Arg('email') email: string,
-    @Ctx() { redis }: AppContext
+    @Ctx() ctx: AppContext
   ): Promise<string> {
-    const user = await User.findOne({ where: { email } });
-
-    if (user) {
-      const token = v4();
-      await redis.set(
-        FORGOT_PASSWORD_PREFIX + token,
-        user.id,
-        'ex',
-        1000 * 60 * 60 * 24 * 3
-      );
-
-      sendEmail(
-        email,
-        `<a href="http://localhost:3000/change-password/${token}">reset password</a>`
-      );
-    }
-
-    return 'Confirmation email was sent, you should receive it soon if email exists';
+    return this.userService.forgotPassword(email, ctx);
   }
 
   @Mutation(() => UserResponse)
   async register(
-    @Arg('registerInput') { username, password, email }: RegisterInput,
-    @Ctx() { req }: AppContext
+    @Arg('registerInput') input: RegisterInput,
+    @Ctx() ctx: AppContext
   ): Promise<UserResponse> {
-    const hashedPassword = await argon2.hash(password);
-    let user;
-
-    try {
-      user = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-      }).save();
-    } catch (e) {
-      return {
-        errors: [
-          { field: 'username', message: 'Username or email already exists' },
-        ],
-      };
-    }
-
-    req.session.userId = user.id;
-
-    return { user };
+    return this.userService.register(input, ctx);
   }
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg('loginInput') { username, password }: LoginInput,
-    @Ctx() { req }: AppContext
+    @Arg('loginInput') input: LoginInput,
+    @Ctx() ctx: AppContext
   ): Promise<UserResponse> {
-    const user = await User.findOne({ where: { username } });
-    if (!user) {
-      return {
-        errors: [
-          { field: 'credentials', message: 'Wrong username or password' },
-        ],
-      };
-    }
-
-    const isPasswordValid = await argon2.verify(user.password, password);
-    if (!isPasswordValid) {
-      return {
-        errors: [
-          { field: 'credentials', message: 'Wrong username or password' },
-        ],
-      };
-    }
-
-    (req.session as any).userId = user.id;
-
-    return { user };
+    return this.userService.login(input, ctx);
   }
 
   @Mutation(() => Boolean)
-  logout(@Ctx() { req, res }: AppContext) {
-    res.clearCookie(COOKIE_NAME);
-
-    return new Promise((resolve) =>
-      req.session.destroy((err) => resolve(!err))
-    );
+  logout(@Ctx() ctx: AppContext) {
+    return this.userService.logout(ctx);
   }
 }
