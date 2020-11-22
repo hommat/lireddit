@@ -8,11 +8,11 @@ import {
   UseMiddleware,
   Int,
 } from 'type-graphql';
-import { Post } from '../entities/Post';
 import { MyContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
 import { getConnection } from 'typeorm';
 import { Vote } from '../entities/Vote';
+import { PostRepository } from '../repositories/PostRepository';
 
 @InputType()
 class VoteInput {
@@ -41,19 +41,12 @@ export class VoteResolver {
     if (vote && vote.value !== realValue) {
       await getConnection().transaction(async (em) => {
         const updateVotePromise = em
-          .createQueryBuilder()
-          .update(Vote)
-          .where('postId = :postId', { postId })
-          .andWhere('userId = :userId', { userId })
-          .set({ value: realValue })
-          .execute();
+          .getRepository(Vote)
+          .update({ postId, userId }, { value: realValue });
 
         const updatePostPromise = em
-          .createQueryBuilder()
-          .update(Post)
-          .where('id = :postId', { postId })
-          .set({ points: () => `points + ${2 * realValue}` })
-          .execute();
+          .getCustomRepository(PostRepository)
+          .addPoints(postId, 2 * realValue);
 
         await Promise.all([updateVotePromise, updatePostPromise]);
       });
@@ -61,18 +54,12 @@ export class VoteResolver {
     } else if (!vote) {
       await getConnection().transaction(async (em) => {
         const createVotePromise = em
-          .createQueryBuilder()
-          .insert()
-          .into(Vote)
-          .values({ postId, userId, value: realValue })
-          .execute();
+          .getRepository(Vote)
+          .insert({ postId, userId, value: realValue });
 
         const updatePostPromise = em
-          .createQueryBuilder()
-          .update(Post)
-          .where('id = :postId', { postId })
-          .set({ points: () => `points + ${realValue}` })
-          .execute();
+          .getCustomRepository(PostRepository)
+          .addPoints(postId, realValue);
 
         await Promise.all([createVotePromise, updatePostPromise]);
       });

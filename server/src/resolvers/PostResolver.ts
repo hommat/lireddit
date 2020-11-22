@@ -15,8 +15,9 @@ import {
 import { Post } from '../entities/Post';
 import { MyContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
-import { getConnection } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import { User } from '../entities/User';
+import { PostRepository } from '../repositories/PostRepository';
 
 @InputType()
 class CreatePostInput {
@@ -76,18 +77,10 @@ export class PostResolver {
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(limit, 50);
     const realLimitPlusOne = realLimit + 1;
-
-    const qb = getConnection()
-      .getRepository(Post)
-      .createQueryBuilder('p')
-      .orderBy('p.createdAt', 'DESC')
-      .take(realLimitPlusOne);
-
-    if (cursor) {
-      qb.where('p.createdAt < :c', { c: new Date(+cursor) });
-    }
-
-    const posts = await qb.getMany();
+    const posts = await getCustomRepository(PostRepository).getPaginated(
+      realLimit,
+      cursor
+    );
 
     return {
       posts: posts.slice(0, realLimit),
