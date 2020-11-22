@@ -5,12 +5,15 @@ import { User } from '../entities/User';
 import { AppContext } from '../types';
 import { PostRepository } from '../repositories/PostRepository';
 import { PaginatedPosts, CreatePostInput } from '../types/post';
+import { AuthService } from './AuthService';
 
 export class PostService {
   private readonly postRepository: PostRepository;
+  private readonly authService: AuthService;
 
   constructor() {
     this.postRepository = getCustomRepository(PostRepository);
+    this.authService = new AuthService();
   }
 
   getPostTextSnippet(post: Post): string {
@@ -22,7 +25,7 @@ export class PostService {
   }
 
   async getPostVoteStatus(post: Post, ctx: AppContext): Promise<number> {
-    const { userId } = ctx.req.session;
+    const userId = this.authService.getSessionUserId(ctx);
     if (!userId) {
       return 0;
     }
@@ -49,7 +52,7 @@ export class PostService {
   }
 
   async createPost(input: CreatePostInput, ctx: AppContext): Promise<Post> {
-    const creatorId = ctx.req.session.userId;
+    const creatorId = this.authService.getSessionUserId(ctx);
 
     return Post.create({ ...input, creatorId }).save();
   }

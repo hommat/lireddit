@@ -8,24 +8,26 @@ import {
   ChangePasswordInput,
   UserResponse,
   RegisterInput,
-  LoginInput,
 } from '../types/user';
-import { FORGOT_PASSWORD_PREFIX, COOKIE_NAME } from '../constants';
+import { FORGOT_PASSWORD_PREFIX } from '../constants';
 import { sendEmail } from '../utils/sendEmail';
+import { AuthService } from './AuthService';
 
 export class UserService {
   private readonly userRepository: Repository<User>;
+  private readonly authService: AuthService;
 
   constructor() {
     this.userRepository = User.getRepository();
+    this.authService = new AuthService();
   }
 
   getUserEmail(user: User, ctx: AppContext): string {
-    return ctx.req.session.userId === user.id ? user.email : '';
+    return this.authService.getSessionUserId(ctx) === user.id ? user.email : '';
   }
 
   getCurrentUser(ctx: AppContext) {
-    const { userId } = ctx.req.session;
+    const userId = this.authService.getSessionUserId(ctx);
     if (!userId) {
       return null;
     }
@@ -63,18 +65,17 @@ export class UserService {
     ]);
 
     await User.update({ id: +userId }, { password: hashedPassword });
-    ctx.req.session.userId = user.id;
+    this.authService.setSessionUserId(ctx, user.id);
 
     return { user };
   }
 
   async forgotPassword(email: string, ctx: AppContext): Promise<string> {
-    const { redis } = ctx;
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (user) {
       const token = v4();
-      await redis.set(
+      await ctx.redis.set(
         FORGOT_PASSWORD_PREFIX + token,
         user.id,
         'ex',
@@ -111,41 +112,8 @@ export class UserService {
       };
     }
 
-    ctx.req.session.userId = user.id;
+    this.authService.setSessionUserId(ctx, user.id);
 
     return { user };
-  }
-
-  async login(input: LoginInput, ctx: AppContext): Promise<UserResponse> {
-    const { username, password } = input;
-    const user = await User.findOne({ where: { username } });
-    if (!user) {
-      return {
-        errors: [
-          { field: 'credentials', message: 'Wrong username or password' },
-        ],
-      };
-    }
-
-    const isPasswordValid = await argon2.verify(user.password, password);
-    if (!isPasswordValid) {
-      return {
-        errors: [
-          { field: 'credentials', message: 'Wrong username or password' },
-        ],
-      };
-    }
-
-    ctx.req.session.userId = user.id;
-
-    return { user };
-  }
-
-  logout({ res, req }: AppContext): Promise<unknown> {
-    res.clearCookie(COOKIE_NAME);
-
-    return new Promise((resolve) =>
-      req.session.destroy((err) => resolve(!err))
-    );
   }
 }

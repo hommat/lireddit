@@ -5,6 +5,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { UserResolver } from './resolvers/UserResolver';
 import { PostResolver } from './resolvers/PostResolver';
+import { AuthResolver } from './resolvers/AuthResolver';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
@@ -63,7 +64,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, PostResolver, VoteResolver],
+      resolvers: [UserResolver, PostResolver, VoteResolver, AuthResolver],
       validate: false,
     }),
     context: ({ req, res }): AppContext => ({

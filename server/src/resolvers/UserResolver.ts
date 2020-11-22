@@ -14,7 +14,6 @@ import {
   UserResponse,
   ChangePasswordInput,
   RegisterInput,
-  LoginInput,
 } from '../types/user';
 import { UserService } from '../services/UserService';
 
@@ -58,18 +57,5 @@ export class UserResolver {
     @Ctx() ctx: AppContext
   ): Promise<UserResponse> {
     return this.userService.register(input, ctx);
-  }
-
-  @Mutation(() => UserResponse)
-  async login(
-    @Arg('loginInput') input: LoginInput,
-    @Ctx() ctx: AppContext
-  ): Promise<UserResponse> {
-    return this.userService.login(input, ctx);
-  }
-
-  @Mutation(() => Boolean)
-  logout(@Ctx() ctx: AppContext) {
-    return this.userService.logout(ctx);
   }
 }
