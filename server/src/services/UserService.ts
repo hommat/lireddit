@@ -10,18 +10,22 @@ import {
   RegisterInput,
 } from '../types/user';
 import { FORGOT_PASSWORD_PREFIX } from '../constants/auth';
-import { sendEmail } from '../utils/sendEmail';
 import { AuthService } from './AuthService';
+import { EmailService } from './EmailService';
 import { errorFields, errorMessages } from '../constants/errors';
 import { FieldError } from '../types/shared';
+import { CONFIRMATION_EMAIL_SENT_MESSAGE } from '../constants/messages';
+import { createChangePasswordEmail } from 'src/utils/createEmail';
 
 export class UserService {
   private readonly userRepository: Repository<User>;
   private readonly authService: AuthService;
+  private readonly emailService: EmailService;
 
   constructor() {
     this.userRepository = User.getRepository();
     this.authService = new AuthService();
+    this.emailService = new EmailService();
   }
 
   getUserEmail(user: User, ctx: AppContext): string {
@@ -91,13 +95,10 @@ export class UserService {
         1000 * 60 * 60 * 24 * 3
       );
 
-      sendEmail(
-        email,
-        `<a href="http://localhost:3000/change-password/${token}">reset password</a>`
-      );
+      this.emailService.sendChangePasswordEmail(email, token);
     }
 
-    return 'Confirmation email was sent, you should receive it soon if email exists';
+    return CONFIRMATION_EMAIL_SENT_MESSAGE;
   }
 
   async register(input: RegisterInput, ctx: AppContext): Promise<UserResponse> {
