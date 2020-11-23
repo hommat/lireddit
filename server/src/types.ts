@@ -3,7 +3,7 @@ import { Session, SessionData } from 'express-session';
 import { Redis } from 'ioredis';
 import DataLoader from 'dataloader';
 import { User } from './entities/User';
-import { VoteDataLoaderInput } from './utils/createVoteLoader';
+import { VoteDataLoaderInput } from './loaders/vote';
 import { Vote } from './entities/Vote';
 
 interface AppSessionData extends Partial<SessionData> {

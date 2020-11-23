@@ -17,8 +17,8 @@ import { VoteResolver } from './resolvers/VoteResolver';
 import { Post } from './entities/Post';
 import { Vote } from './entities/Vote';
 import { User } from './entities/User';
-import { createUserLoader } from './utils/createUserLoader';
-import { createVoteLoader } from './utils/createVoteLoader';
+import { createUserLoader } from './loaders/user';
+import { createVoteLoader } from './loaders/vote';
 
 let RedisStore = connectRedis(session);
 let redis = new Redis({
