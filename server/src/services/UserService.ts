@@ -15,7 +15,7 @@ import { EmailService } from './EmailService';
 import { errorFields, errorMessages } from '../constants/errors';
 import { FieldError } from '../types/shared';
 import { CONFIRMATION_EMAIL_SENT_MESSAGE } from '../constants/messages';
-import { createChangePasswordEmail } from 'src/utils/createEmail';
+import { CHANGE_PASSWORD_TOKEN_EXPIRE_TIME } from '../constants/time';
 
 export class UserService {
   private readonly userRepository: Repository<User>;
@@ -92,7 +92,7 @@ export class UserService {
         FORGOT_PASSWORD_PREFIX + token,
         user.id,
         'ex',
-        1000 * 60 * 60 * 24 * 3
+        CHANGE_PASSWORD_TOKEN_EXPIRE_TIME
       );
 
       this.emailService.sendChangePasswordEmail(email, token);

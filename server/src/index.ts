@@ -19,6 +19,7 @@ import { Vote } from './entities/Vote';
 import { User } from './entities/User';
 import { createUserLoader } from './loaders/user';
 import { createVoteLoader } from './loaders/vote';
+import { COOKIE_EXPIRE_TIME } from './constants/time';
 
 let RedisStore = connectRedis(session);
 let redis = new Redis({
@@ -52,7 +53,7 @@ const main = async () => {
       name: COOKIE_NAME,
       store: new RedisStore({ client: redis, disableTouch: true }),
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+        maxAge: COOKIE_EXPIRE_TIME,
         httpOnly: true,
         sameSite: 'lax',
         secure: __prod__,
