@@ -4,7 +4,9 @@ import { Repository } from 'typeorm';
 import { User } from '../entities/User';
 import { AppContext } from '../types';
 import { UserResponse, LoginInput } from '../types/user';
-import { COOKIE_NAME } from '../constants';
+import { COOKIE_NAME } from '../constants/auth';
+import { errorMessages, errorFields } from '../constants/errors';
+import { FieldError } from '../types/shared';
 
 export class AuthService {
   private readonly userRepository: Repository<User>;
@@ -19,7 +21,10 @@ export class AuthService {
     if (!user) {
       return {
         errors: [
-          { field: 'credentials', message: 'Wrong username or password' },
+          new FieldError(
+            errorFields.CREDENTIALS,
+            errorMessages.auth.WRONG_USERNAME_OR_PASSWORD
+          ),
         ],
       };
     }
@@ -28,7 +33,10 @@ export class AuthService {
     if (!isPasswordValid) {
       return {
         errors: [
-          { field: 'credentials', message: 'Wrong username or password' },
+          new FieldError(
+            errorFields.CREDENTIALS,
+            errorMessages.auth.WRONG_USERNAME_OR_PASSWORD
+          ),
         ],
       };
     }

@@ -9,9 +9,11 @@ import {
   UserResponse,
   RegisterInput,
 } from '../types/user';
-import { FORGOT_PASSWORD_PREFIX } from '../constants';
+import { FORGOT_PASSWORD_PREFIX } from '../constants/auth';
 import { sendEmail } from '../utils/sendEmail';
 import { AuthService } from './AuthService';
+import { errorFields, errorMessages } from '../constants/errors';
+import { FieldError } from '../types/shared';
 
 export class UserService {
   private readonly userRepository: Repository<User>;
@@ -45,14 +47,21 @@ export class UserService {
     let userId = await ctx.redis.get(tokenKey);
     if (!userId) {
       return {
-        errors: [{ field: 'token', message: 'Token is not valid' }],
+        errors: [
+          new FieldError(errorFields.token, errorMessages.user.TOKEN_NOT_VALID),
+        ],
       };
     }
 
     const user = await User.findOne(+userId);
     if (!user) {
       return {
-        errors: [{ field: 'token', message: 'User not longer exists' }],
+        errors: [
+          new FieldError(
+            errorFields.token,
+            errorMessages.user.USER_NO_LONGER_EXISTS
+          ),
+        ],
       };
     }
 
@@ -93,6 +102,34 @@ export class UserService {
 
   async register(input: RegisterInput, ctx: AppContext): Promise<UserResponse> {
     const { username, password, email } = input;
+
+    const userWithUsername = await this.userRepository.findOne({
+      where: { username },
+    });
+
+    if (userWithUsername) {
+      return {
+        errors: [
+          new FieldError(
+            errorFields.USERNAME,
+            errorMessages.user.USERNAME_TAKEN
+          ),
+        ],
+      };
+    }
+
+    const userWithEmail = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (userWithEmail) {
+      return {
+        errors: [
+          new FieldError(errorFields.EMAIL, errorMessages.user.EMAIL_TAKEN),
+        ],
+      };
+    }
+
     const hashedPassword = await argon2.hash(password);
     const newUserData: DeepPartial<User> = {
       username,
@@ -100,18 +137,7 @@ export class UserService {
       password: hashedPassword,
     };
 
-    let user;
-
-    try {
-      user = await this.userRepository.create(newUserData).save();
-    } catch (e) {
-      return {
-        errors: [
-          { field: 'username', message: 'Username or email already exists' },
-        ],
-      };
-    }
-
+    const user = await this.userRepository.create(newUserData).save();
     this.authService.setSessionUserId(ctx, user.id);
 
     return { user };
