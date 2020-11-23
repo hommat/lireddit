@@ -1,7 +1,8 @@
+import DataLoader from 'dataloader';
 import { Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
 import { Redis } from 'ioredis';
-import DataLoader from 'dataloader';
+
 import { User } from './entities/User';
 import { VoteDataLoaderInput } from './loaders/vote';
 import { Vote } from './entities/Vote';

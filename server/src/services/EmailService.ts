@@ -37,7 +37,7 @@ export class EmailService {
   sendChangePasswordEmail(to: string, token: string) {
     this.sendEmail(
       to,
-      createChangePasswordEmail(process.env.WEB_HOST_CLIENT, token)
+      createChangePasswordEmail(process.env.WEB_HOST_CLIENT!, token)
     );
   }
 }
