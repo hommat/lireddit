@@ -1,7 +1,7 @@
 import { InputType, Field, ObjectType } from 'type-graphql';
 
-import { User } from '../entities/User';
-import { FieldError } from './shared';
+import { FieldError } from '@appTypes/shared';
+import { User } from '@entities/User';
 
 @InputType()
 export class LoginInput {

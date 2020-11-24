@@ -1,10 +1,10 @@
 import { getConnection, Connection } from 'typeorm';
 
-import { Vote } from '../entities/Vote';
-import { AppContext } from '../types';
-import { VoteInput } from '../types/vote';
-import { PostRepository } from '../repositories/PostRepository';
-import { AuthService } from './AuthService';
+import { AppContext } from '@appTypes/app';
+import { VoteInput } from '@appTypes/vote';
+import { Vote } from '@entities/Vote';
+import { PostRepository } from '@repositories/PostRepository';
+import { AuthService } from '@services/AuthService';
 
 export class VoteService {
   private readonly authService: AuthService;

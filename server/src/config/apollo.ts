@@ -2,14 +2,14 @@ import { Redis } from 'ioredis';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-express';
 
-import { __prod__ } from '../constants/utils';
-import { UserResolver } from '../resolvers/UserResolver';
-import { PostResolver } from '../resolvers/PostResolver';
-import { AuthResolver } from '../resolvers/AuthResolver';
-import { AppContext } from '../types';
-import { VoteResolver } from '../resolvers/VoteResolver';
-import { createUserLoader } from '../loaders/user';
-import { createVoteLoader } from '../loaders/vote';
+import { AppContext } from '@appTypes/app';
+import { __prod__ } from '@constants/utils';
+import { AuthResolver } from '@resolvers/AuthResolver';
+import { PostResolver } from '@resolvers/PostResolver';
+import { UserResolver } from '@resolvers/UserResolver';
+import { VoteResolver } from '@resolvers/VoteResolver';
+import { createUserLoader } from '@loaders/user';
+import { createVoteLoader } from '@loaders/vote';
 
 export const createApolloServer = async (
   redis: Redis

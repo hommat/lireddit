@@ -1,9 +1,9 @@
 import { createConnection } from 'typeorm';
 
-import { __prod__ } from '../constants/utils';
-import { Post } from '../entities/Post';
-import { Vote } from '../entities/Vote';
-import { User } from '../entities/User';
+import { __prod__ } from '@constants/utils';
+import { Post } from '@entities/Post';
+import { User } from '@entities/User';
+import { Vote } from '@entities/Vote';
 
 export const connectDB = async () => {
   await createConnection({

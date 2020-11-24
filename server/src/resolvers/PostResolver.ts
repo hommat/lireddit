@@ -9,12 +9,13 @@ import {
   FieldResolver,
   Root,
 } from 'type-graphql';
-import { Post } from '../entities/Post';
-import { AppContext } from '../types';
-import { isAuth } from '../middleware/isAuth';
-import { User } from '../entities/User';
-import { PostService } from '../services/PostService';
-import { PaginatedPosts, CreatePostInput } from '../types/post';
+
+import { AppContext } from '@appTypes/app';
+import { PaginatedPosts, CreatePostInput } from '@appTypes/post';
+import { Post } from '@entities/Post';
+import { User } from '@entities/User';
+import { isAuth } from '@middleware/isAuth';
+import { PostService } from '@services/PostService';
 
 @Resolver(Post)
 export class PostResolver {

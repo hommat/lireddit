@@ -10,8 +10,8 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { User } from './User';
-import { Vote } from './Vote';
+import { User } from '@entities/User';
+import { Vote } from '@entities/Vote';
 
 @ObjectType()
 @Entity()

@@ -2,20 +2,20 @@ import argon2 from 'argon2';
 import { Repository, DeepPartial } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { User } from '../entities/User';
-import { AppContext } from '../types';
+import { AppContext } from '@appTypes/app';
+import { FieldError } from '@appTypes/shared';
 import {
   ChangePasswordInput,
   UserResponse,
   RegisterInput,
-} from '../types/user';
-import { FORGOT_PASSWORD_PREFIX } from '../constants/auth';
-import { AuthService } from './AuthService';
-import { EmailService } from './EmailService';
-import { errorFields, errorMessages } from '../constants/errors';
-import { FieldError } from '../types/shared';
-import { CONFIRMATION_EMAIL_SENT_MESSAGE } from '../constants/messages';
-import { CHANGE_PASSWORD_TOKEN_EXPIRE_TIME } from '../constants/time';
+} from '@appTypes/user';
+import { FORGOT_PASSWORD_PREFIX } from '@constants/auth';
+import { errorFields, errorMessages } from '@constants/errors';
+import { CONFIRMATION_EMAIL_SENT_MESSAGE } from '@constants/messages';
+import { CHANGE_PASSWORD_TOKEN_EXPIRE_TIME } from '@constants/time';
+import { User } from '@entities/User';
+import { AuthService } from '@services/AuthService';
+import { EmailService } from '@services/EmailService';
 
 export class UserService {
   private readonly userRepository: Repository<User>;

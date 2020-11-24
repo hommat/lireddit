@@ -9,8 +9,8 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { Post } from './Post';
-import { Vote } from './Vote';
+import { Post } from '@entities/Post';
+import { Vote } from '@entities/Vote';
 
 @ObjectType()
 @Entity()

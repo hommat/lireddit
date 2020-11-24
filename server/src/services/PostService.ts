@@ -1,11 +1,11 @@
 import { getCustomRepository } from 'typeorm';
 
-import { Post } from '../entities/Post';
-import { User } from '../entities/User';
-import { AppContext } from '../types';
-import { PostRepository } from '../repositories/PostRepository';
-import { PaginatedPosts, CreatePostInput } from '../types/post';
-import { AuthService } from './AuthService';
+import { AppContext } from '@appTypes/app';
+import { PaginatedPosts, CreatePostInput } from '@appTypes/post';
+import { Post } from '@entities/Post';
+import { User } from '@entities/User';
+import { PostRepository } from '@repositories/PostRepository';
+import { AuthService } from '@services/AuthService';
 
 export class PostService {
   private readonly postRepository: PostRepository;

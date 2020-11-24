@@ -21,7 +21,18 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": "./src/",
+    "paths": {
+      "@constants/*": ["constants/*"],
+      "@entities/*": ["entities/*"],
+      "@loaders/*": ["loaders/*"],
+      "@middleware/*": ["middleware/*"],
+      "@repositories/*": ["repositories/*"],
+      "@resolvers/*": ["resolvers/*"],
+      "@services/*": ["services/*"],
+      "@appTypes/*": ["types/*"],
+      "@utils/*": ["utils/*"]
+    }
   },
   "exclude": ["node_modules"],
   "include": ["./src/**/*.tsx", "./src/**/*.ts"]

@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
-import { __prod__ } from '../constants/utils';
-import { subjects } from '../constants/email';
-import { createChangePasswordEmail } from '../utils/createEmail';
+import { subjects } from '@constants/email';
+import { __prod__ } from '@constants/utils';
+import { createChangePasswordEmail } from '@utils/createEmail';
 
 export class EmailService {
   private transporter: Mail;

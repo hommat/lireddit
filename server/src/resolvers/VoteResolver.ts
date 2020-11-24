@@ -1,10 +1,10 @@
 import { Resolver, Arg, Mutation, Ctx, UseMiddleware } from 'type-graphql';
 
-import { AppContext } from '../types';
-import { isAuth } from '../middleware/isAuth';
-import { Vote } from '../entities/Vote';
-import { VoteInput } from '../types/vote';
-import { VoteService } from '../services/VoteService';
+import { AppContext } from '@appTypes/app';
+import { VoteInput } from '@appTypes/vote';
+import { Vote } from '@entities/Vote';
+import { isAuth } from '@middleware/isAuth';
+import { VoteService } from '@services/VoteService';
 
 @Resolver(Vote)
 export class VoteResolver {

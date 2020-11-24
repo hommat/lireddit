@@ -1,6 +1,6 @@
 import { InputType, Field, ObjectType } from 'type-graphql';
 
-import { Post } from '../entities/Post';
+import { Post } from '@entities/Post';
 
 @InputType()
 export class CreatePostInput {

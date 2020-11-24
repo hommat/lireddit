@@ -8,14 +8,14 @@ import {
   Root,
 } from 'type-graphql';
 
-import { AppContext } from '../types';
-import { User } from '../entities/User';
+import { AppContext } from '@appTypes/app';
 import {
   UserResponse,
   ChangePasswordInput,
   RegisterInput,
-} from '../types/user';
-import { UserService } from '../services/UserService';
+} from '@appTypes/user';
+import { User } from '@entities/User';
+import { UserService } from '@services/UserService';
 
 @Resolver(User)
 export class UserResolver {

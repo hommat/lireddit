@@ -1,5 +1,5 @@
 import DataLoader from 'dataloader';
-import { Vote } from '../entities/Vote';
+import { Vote } from '@entities/Vote';
 
 export type VoteDataLoaderInput = Pick<Vote, 'postId' | 'userId'>;
 type VoteRecord = Record<string, Vote>;

@@ -3,9 +3,9 @@ import { Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
 import { Redis } from 'ioredis';
 
-import { User } from './entities/User';
-import { VoteDataLoaderInput } from './loaders/vote';
-import { Vote } from './entities/Vote';
+import { User } from '@entities/User';
+import { Vote } from '@entities/Vote';
+import { VoteDataLoaderInput } from '@loaders/vote';
 
 interface AppSessionData extends Partial<SessionData> {
   userId?: number;

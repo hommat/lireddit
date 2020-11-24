@@ -1,12 +1,12 @@
 import argon2 from 'argon2';
 import { Repository } from 'typeorm';
 
-import { User } from '../entities/User';
-import { AppContext } from '../types';
-import { UserResponse, LoginInput } from '../types/user';
-import { COOKIE_NAME } from '../constants/auth';
-import { errorMessages, errorFields } from '../constants/errors';
-import { FieldError } from '../types/shared';
+import { AppContext } from '@appTypes/app';
+import { FieldError } from '@appTypes/shared';
+import { UserResponse, LoginInput } from '@appTypes/user';
+import { COOKIE_NAME } from '@constants/auth';
+import { errorMessages, errorFields } from '@constants/errors';
+import { User } from '@entities/User';
 
 export class AuthService {
   private readonly userRepository: Repository<User>;

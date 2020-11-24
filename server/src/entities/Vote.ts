@@ -1,7 +1,7 @@
 import { Entity, BaseEntity, ManyToOne, PrimaryColumn, Column } from 'typeorm';
 
-import { User } from './User';
-import { Post } from './Post';
+import { Post } from '@entities/Post';
+import { User } from '@entities/User';
 
 @Entity()
 export class Vote extends BaseEntity {
