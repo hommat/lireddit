@@ -16,7 +16,7 @@ const initialFormValues: RegisterInput = {
   email: '',
 };
 
-const Register = ({}) => {
+const Register = () => {
   const router = useRouter();
   const [register] = useRegisterMutation();
 
@@ -44,11 +44,7 @@ const Register = ({}) => {
       <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form>
-            <InputField
-              name="username"
-              label="Enter username"
-              placeholder="Enter username..."
-            />
+            <InputField name="username" label="Enter username" placeholder="Enter username..." />
             <InputField
               name="email"
               label="Enter email"

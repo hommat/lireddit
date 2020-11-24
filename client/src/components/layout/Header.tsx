@@ -6,9 +6,7 @@ import NavLoggedIn from './NavLoggedIn';
 import NavLoggedOut from './NavLoggedOut';
 import { useCurrentUserQuery } from '@generated/graphql';
 
-interface HeaderProps {}
-
-const Header: FC<HeaderProps> = ({}) => {
+const Header: FC = () => {
   const { data } = useCurrentUserQuery();
 
   return (
@@ -19,9 +17,7 @@ const Header: FC<HeaderProps> = ({}) => {
             <Heading>LiReddit</Heading>
           </Link>
         </NextLink>
-        <Box ml={'auto'}>
-          {data?.currentUser ? <NavLoggedIn /> : <NavLoggedOut />}
-        </Box>
+        <Box ml={'auto'}>{data?.currentUser ? <NavLoggedIn /> : <NavLoggedOut />}</Box>
       </Flex>
     </Flex>
   );

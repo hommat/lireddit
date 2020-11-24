@@ -14,7 +14,7 @@ const initialFormValues: CreatePostInput = {
   title: '',
 };
 
-const CreatePost = ({}) => {
+const CreatePost = () => {
   useIsAuth();
 
   const router = useRouter();
@@ -42,17 +42,8 @@ const CreatePost = ({}) => {
       <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form>
-            <InputField
-              name="title"
-              label="Enter title"
-              placeholder="Enter title..."
-            />
-            <InputField
-              name="text"
-              label="Enter Text"
-              placeholder="Enter text..."
-              textarea
-            />
+            <InputField name="title" label="Enter title" placeholder="Enter title..." />
+            <InputField name="text" label="Enter Text" placeholder="Enter text..." textarea />
 
             <Button type="submit" mt={4} isLoading={isSubmitting}>
               Create

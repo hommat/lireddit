@@ -16,7 +16,7 @@ const initialFormValues: LoginInput = {
   password: '',
 };
 
-const Login = ({}) => {
+const Login = () => {
   const [credentialsError, setCredentialsError] = useState('');
   const router = useRouter();
   const [login] = useLoginMutation();

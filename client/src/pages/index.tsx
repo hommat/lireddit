@@ -21,7 +21,7 @@ export const Index = () => {
     fetchMore({
       variables: {
         ...variables,
-        cursor: data!.posts.posts[data!.posts.posts.length - 1].createdAt,
+        cursor: data?.posts.posts[data?.posts.posts.length - 1].createdAt,
       },
     });
   };

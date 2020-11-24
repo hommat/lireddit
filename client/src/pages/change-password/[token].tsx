@@ -2,13 +2,7 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Formik, Form, FormikHelpers } from 'formik';
-import {
-  FormControl,
-  FormErrorMessage,
-  Button,
-  Box,
-  Link,
-} from '@chakra-ui/core';
+import { FormControl, FormErrorMessage, Button, Box, Link } from '@chakra-ui/core';
 
 import Layout from '@components/layout/Layout';
 import InputField from '@components/form/InputField';

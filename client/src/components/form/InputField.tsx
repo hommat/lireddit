@@ -1,12 +1,6 @@
-import React, { InputHTMLAttributes, FC } from 'react';
+import React, { InputHTMLAttributes, FC, ComponentType } from 'react';
 import { useField } from 'formik';
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
-  Textarea,
-} from '@chakra-ui/core';
+import { FormControl, FormLabel, Input, FormErrorMessage, Textarea } from '@chakra-ui/core';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -15,15 +9,9 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   textarea?: boolean;
 }
 
-const InputField: FC<InputFieldProps> = ({
-  mt = 4,
-  textarea,
-  label,
-  size: _,
-  ...rest
-}) => {
+const InputField: FC<InputFieldProps> = ({ mt = 4, textarea, label, ...rest }) => {
   const [field, { touched, error }] = useField(rest);
-  const InputComponent: any = textarea ? Textarea : Input;
+  const InputComponent: ComponentType<{ id?: string }> = textarea ? Textarea : Input;
 
   return (
     <FormControl isInvalid={!!error && touched} mt={mt}>

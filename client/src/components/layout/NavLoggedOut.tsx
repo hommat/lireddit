@@ -1,10 +1,7 @@
-import React, { FC } from 'react';
 import NextLink from 'next/link';
 import { Box, Link } from '@chakra-ui/core';
 
-interface NavLoggedOutProps {}
-
-const NavLoggedOut: FC<NavLoggedOutProps> = ({}) => {
+const NavLoggedOut = () => {
   return (
     <Box ml={'auto'}>
       <NextLink href="/login">

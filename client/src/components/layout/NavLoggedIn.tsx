@@ -1,4 +1,3 @@
-import React, { FC } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { Box, Flex, Button } from '@chakra-ui/core';
@@ -11,14 +10,11 @@ import {
   CurrentUserDocument,
 } from '@generated/graphql';
 
-interface NavLoggedInProps {}
-
-const NavLoggedIn: FC<NavLoggedInProps> = ({}) => {
+const NavLoggedIn = () => {
   const apolloClient = useApolloClient();
   const router = useRouter();
   const { data } = useCurrentUserQuery();
   const [logout, { loading: logoutLoading }] = useLogoutMutation();
-  const { username } = data!.currentUser!;
 
   const handleLogout = () => {
     logout();
@@ -39,7 +35,7 @@ const NavLoggedIn: FC<NavLoggedInProps> = ({}) => {
   return (
     <Box ml={'auto'}>
       <Flex align="center">
-        <Box mr={2}>{username}</Box>
+        <Box mr={2}>{data?.currentUser?.username}</Box>
         <NextLink href="/create-post">
           <Button>create post</Button>
         </NextLink>
