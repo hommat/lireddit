@@ -11,9 +11,7 @@ import { VoteResolver } from '@resolvers/VoteResolver';
 import { createUserLoader } from '@loaders/user';
 import { createVoteLoader } from '@loaders/vote';
 
-export const createApolloServer = async (
-  redis: Redis
-): Promise<ApolloServer> => {
+export const createApolloServer = async (redis: Redis): Promise<ApolloServer> => {
   return new ApolloServer({
     schema: await buildSchema({
       resolvers: [UserResolver, PostResolver, VoteResolver, AuthResolver],

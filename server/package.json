@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon -e ts,js --exec ts-node -r tsconfig-paths/register src/index.ts"
   },
   "devDependencies": {
     "@types/connect-redis": "^0.0.15",
@@ -33,6 +33,7 @@
     "nodemailer": "^6.4.16",
     "pg": "^8.5.0",
     "reflect-metadata": "^0.1.13",
+    "tsconfig-paths": "^3.9.0",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.2.29",
     "uuid": "^8.3.1"
