@@ -34,16 +34,10 @@ export class PostService {
     return vote ? vote.value : 0;
   }
 
-  async getPaginatedPosts(
-    limit: number,
-    cursor: string | null
-  ): Promise<PaginatedPosts> {
+  async getPaginatedPosts(limit: number, cursor: string | null): Promise<PaginatedPosts> {
     const realLimit = Math.min(limit, 50);
     const realLimitPlusOne = realLimit + 1;
-    const posts = await this.postRepository.getPaginatedPosts(
-      realLimit,
-      cursor
-    );
+    const posts = await this.postRepository.getPaginatedPosts(realLimit, cursor);
 
     return {
       posts: posts.slice(0, realLimit),

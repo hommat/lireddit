@@ -9,19 +9,12 @@ const createVoteLoaderId = ({ postId, userId }: VoteDataLoaderInput): string =>
 
 export const createVoteLoader = () =>
   new DataLoader<VoteDataLoaderInput, Vote>(async (voteDataLoaderInputs) => {
-    const votes = await Vote.findByIds(
-      voteDataLoaderInputs as VoteDataLoaderInput[]
-    );
+    const votes = await Vote.findByIds(voteDataLoaderInputs as VoteDataLoaderInput[]);
 
-    const votesRecord: VoteRecord = votes.reduce(
-      (acc: VoteRecord, vote: Vote) => {
-        acc[createVoteLoaderId(vote)] = vote;
-        return acc;
-      },
-      {}
-    );
+    const votesRecord: VoteRecord = votes.reduce((acc: VoteRecord, vote: Vote) => {
+      acc[createVoteLoaderId(vote)] = vote;
+      return acc;
+    }, {});
 
-    return voteDataLoaderInputs.map(
-      (input) => votesRecord[createVoteLoaderId(input)]
-    );
+    return voteDataLoaderInputs.map((input) => votesRecord[createVoteLoaderId(input)]);
   });

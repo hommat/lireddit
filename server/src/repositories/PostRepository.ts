@@ -5,9 +5,7 @@ import { Post } from '@entities/Post';
 @EntityRepository(Post)
 export class PostRepository extends Repository<Post> {
   getPaginatedPosts(limit: number, cursor: string | null): Promise<Post[]> {
-    const qb = this.createQueryBuilder('p')
-      .orderBy('p.createdAt', 'DESC')
-      .take(limit);
+    const qb = this.createQueryBuilder('p').orderBy('p.createdAt', 'DESC').take(limit);
 
     if (cursor) {
       qb.where('p.createdAt < :c', { c: new Date(+cursor) });

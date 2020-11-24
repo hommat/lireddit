@@ -21,7 +21,7 @@ export class EmailService {
   }
 
   async sendEmail(to: string, html: string) {
-    let info = await this.transporter.sendMail({
+    const info = await this.transporter.sendMail({
       from: '"Fred Foo 👻" <foo@example.com>',
       to: to,
       subject: subjects.CHANGE_PASSWORD,
@@ -35,9 +35,6 @@ export class EmailService {
   }
 
   sendChangePasswordEmail(to: string, token: string) {
-    this.sendEmail(
-      to,
-      createChangePasswordEmail(process.env.WEB_HOST_CLIENT!, token)
-    );
+    this.sendEmail(to, createChangePasswordEmail(process.env.WEB_HOST_CLIENT!, token));
   }
 }

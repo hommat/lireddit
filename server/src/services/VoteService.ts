@@ -35,13 +35,8 @@ export class VoteService {
 
   private async changeVote(postId: number, userId: number, value: number) {
     await this.connection.transaction(async (em) => {
-      const updateVotePromise = em
-        .getRepository(Vote)
-        .update({ postId, userId }, { value });
-
-      const updatePostPromise = em
-        .getCustomRepository(PostRepository)
-        .addPoints(postId, 2 * value);
+      const updateVotePromise = em.getRepository(Vote).update({ postId, userId }, { value });
+      const updatePostPromise = em.getCustomRepository(PostRepository).addPoints(postId, 2 * value);
 
       await Promise.all([updateVotePromise, updatePostPromise]);
     });
@@ -49,13 +44,8 @@ export class VoteService {
 
   private async makeVote(postId: number, userId: number, value: number) {
     await this.connection.transaction(async (em) => {
-      const createVotePromise = em
-        .getRepository(Vote)
-        .insert({ postId, userId, value });
-
-      const updatePostPromise = em
-        .getCustomRepository(PostRepository)
-        .addPoints(postId, value);
+      const createVotePromise = em.getRepository(Vote).insert({ postId, userId, value });
+      const updatePostPromise = em.getCustomRepository(PostRepository).addPoints(postId, value);
 
       await Promise.all([createVotePromise, updatePostPromise]);
     });

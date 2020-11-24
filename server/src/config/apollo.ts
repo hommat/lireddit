@@ -3,7 +3,6 @@ import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-express';
 
 import { AppContext } from '@appTypes/app';
-import { __prod__ } from '@constants/utils';
 import { AuthResolver } from '@resolvers/AuthResolver';
 import { PostResolver } from '@resolvers/PostResolver';
 import { UserResolver } from '@resolvers/UserResolver';

@@ -4,11 +4,7 @@ import { v4 } from 'uuid';
 
 import { AppContext } from '@appTypes/app';
 import { FieldError } from '@appTypes/shared';
-import {
-  ChangePasswordInput,
-  UserResponse,
-  RegisterInput,
-} from '@appTypes/user';
+import { ChangePasswordInput, UserResponse, RegisterInput } from '@appTypes/user';
 import { FORGOT_PASSWORD_PREFIX } from '@constants/auth';
 import { errorFields, errorMessages } from '@constants/errors';
 import { CONFIRMATION_EMAIL_SENT_MESSAGE } from '@constants/messages';
@@ -41,41 +37,28 @@ export class UserService {
     return this.userRepository.findOne(userId);
   }
 
-  async changePassword(
-    input: ChangePasswordInput,
-    ctx: AppContext
-  ): Promise<UserResponse> {
+  async changePassword(input: ChangePasswordInput, ctx: AppContext): Promise<UserResponse> {
     const { token, password } = input;
     const tokenKey = FORGOT_PASSWORD_PREFIX + token;
 
-    let userId = await ctx.redis.get(tokenKey);
+    const userId = await ctx.redis.get(tokenKey);
     if (!userId) {
       return {
-        errors: [
-          new FieldError(errorFields.token, errorMessages.user.TOKEN_NOT_VALID),
-        ],
+        errors: [new FieldError(errorFields.token, errorMessages.user.TOKEN_NOT_VALID)],
       };
     }
 
     const user = await User.findOne(+userId);
     if (!user) {
       return {
-        errors: [
-          new FieldError(
-            errorFields.token,
-            errorMessages.user.USER_NO_LONGER_EXISTS
-          ),
-        ],
+        errors: [new FieldError(errorFields.token, errorMessages.user.USER_NO_LONGER_EXISTS)],
       };
     }
 
     const hashPasswordPromise = argon2.hash(password);
     const deleteTokenPromise = ctx.redis.del(tokenKey);
 
-    const [hashedPassword] = await Promise.all([
-      hashPasswordPromise,
-      deleteTokenPromise,
-    ]);
+    const [hashedPassword] = await Promise.all([hashPasswordPromise, deleteTokenPromise]);
 
     await User.update({ id: +userId }, { password: hashedPassword });
     this.authService.setSessionUserId(ctx, user.id);
@@ -110,12 +93,7 @@ export class UserService {
 
     if (userWithUsername) {
       return {
-        errors: [
-          new FieldError(
-            errorFields.USERNAME,
-            errorMessages.user.USERNAME_TAKEN
-          ),
-        ],
+        errors: [new FieldError(errorFields.USERNAME, errorMessages.user.USERNAME_TAKEN)],
       };
     }
 
@@ -125,9 +103,7 @@ export class UserService {
 
     if (userWithEmail) {
       return {
-        errors: [
-          new FieldError(errorFields.EMAIL, errorMessages.user.EMAIL_TAKEN),
-        ],
+        errors: [new FieldError(errorFields.EMAIL, errorMessages.user.EMAIL_TAKEN)],
       };
     }
 

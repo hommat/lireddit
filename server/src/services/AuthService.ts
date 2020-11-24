@@ -21,10 +21,7 @@ export class AuthService {
     if (!user) {
       return {
         errors: [
-          new FieldError(
-            errorFields.CREDENTIALS,
-            errorMessages.auth.WRONG_USERNAME_OR_PASSWORD
-          ),
+          new FieldError(errorFields.CREDENTIALS, errorMessages.auth.WRONG_USERNAME_OR_PASSWORD),
         ],
       };
     }
@@ -33,10 +30,7 @@ export class AuthService {
     if (!isPasswordValid) {
       return {
         errors: [
-          new FieldError(
-            errorFields.CREDENTIALS,
-            errorMessages.auth.WRONG_USERNAME_OR_PASSWORD
-          ),
+          new FieldError(errorFields.CREDENTIALS, errorMessages.auth.WRONG_USERNAME_OR_PASSWORD),
         ],
       };
     }
@@ -49,9 +43,7 @@ export class AuthService {
   logout({ res, req }: AppContext): Promise<unknown> {
     res.clearCookie(COOKIE_NAME);
 
-    return new Promise((resolve) =>
-      req.session.destroy((err) => resolve(!err))
-    );
+    return new Promise((resolve) => req.session.destroy((err) => resolve(!err)));
   }
 
   getSessionUserId(ctx: AppContext): number | undefined {

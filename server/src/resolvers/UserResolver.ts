@@ -1,19 +1,7 @@
-import {
-  Resolver,
-  Ctx,
-  Arg,
-  Mutation,
-  Query,
-  FieldResolver,
-  Root,
-} from 'type-graphql';
+import { Resolver, Ctx, Arg, Mutation, Query, FieldResolver, Root } from 'type-graphql';
 
 import { AppContext } from '@appTypes/app';
-import {
-  UserResponse,
-  ChangePasswordInput,
-  RegisterInput,
-} from '@appTypes/user';
+import { UserResponse, ChangePasswordInput, RegisterInput } from '@appTypes/user';
 import { User } from '@entities/User';
 import { UserService } from '@services/UserService';
 
@@ -44,10 +32,7 @@ export class UserResolver {
   }
 
   @Mutation(() => String)
-  async forgotPassword(
-    @Arg('email') email: string,
-    @Ctx() ctx: AppContext
-  ): Promise<string> {
+  async forgotPassword(@Arg('email') email: string, @Ctx() ctx: AppContext): Promise<string> {
     return this.userService.forgotPassword(email, ctx);
   }
 
